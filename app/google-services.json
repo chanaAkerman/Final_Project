@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "933245257423",
+    "firebase_url": "https://songchords-b38e1.firebaseio.com",
+    "project_id": "songchords-b38e1",
+    "storage_bucket": "songchords-b38e1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:933245257423:android:40e973f6f05fe27cc699ba",
+        "android_client_info": {
+          "package_name": "com.example.song_chords"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "933245257423-8uj5cr87frnsjtdo7kgne6bdbjdm74in.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.song_chords",
+            "certificate_hash": "fcb8cf56a87273597a1aee57679957b3afd4393f"
+          }
+        },
+        {
+          "client_id": "933245257423-kfqfm2v6ovtp0dupeeo7usl1t9bl15g6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBByt4pSwxWZibebr7RZh1HHGTGiIhkENk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "933245257423-kfqfm2v6ovtp0dupeeo7usl1t9bl15g6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
