@@ -1,7 +1,10 @@
 package com.example.song_chords;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.nfc.Tag;
 import android.provider.ContactsContract;
+import android.se.omapi.Session;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -40,10 +43,6 @@ public class firebaseManager {
         return 0; // user exist
     }
 
-    public ArrayList<User> getUsers(){
-        return users;
-    }
-
     public boolean emailExist(String email){
         for(int i=0; i<users.size(); i++){
             if(users.get(i).getEmail().equals(email))
@@ -59,12 +58,13 @@ public class firebaseManager {
         }
         return false;
     }
-
-    public void sentMassage(String email){
-
+    public String getPassword(String email){
+        for(int i=0; i<users.size(); i++){
+            if(users.get(i).getEmail().equals(email))
+                return users.get(i).getPassword();
+        }
+        return null;
     }
-
-
 
     public void setUsersRef() {
         // Read from the database
