@@ -5,21 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#EEE8F8"
+    android:orientation="vertical"
     tools:context=".SearchSongActivity">
 
 
     <TextView
         android:id="@+id/heading_label"
+        android:text="Songs Search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:gravity="left"
+        android:paddingLeft="30dp"
         android:paddingTop="20dp"
-        android:paddingRight="20dp"
-        android:paddingBottom="20dp"
-        android:text="Firebase Search"
+        android:paddingBottom="10dp"
         android:textColor="#555555"
-        android:textSize="24sp" />
+        android:textSize="24sp"/>
 
     <EditText
         android:id="@+id/search_field"
@@ -27,18 +27,25 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/heading_label"
         android:layout_below="@+id/heading_label"
-        android:gravity="center"
+        android:gravity="left"
         android:layout_toStartOf="@+id/search_btn"
         android:background="@drawable/search_layout"
         android:ems="10"
         android:hint="Search here"
-        android:inputType="textPersonName"
         android:paddingBottom="10dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="10dp"
         android:textColor="#999999"
         android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_field"
+        android:text="Tap on song to get chords"
+        android:paddingTop="10dp"/>
 
     <ImageButton
         android:id="@+id/search_btn"
@@ -51,15 +58,15 @@
         android:layout_marginRight="30dp"
         android:layout_marginBottom="-15dp"
         android:background="@color/colorlightPink"
+        android:paddingLeft="10dp"
         app:srcCompat="@drawable/search_button" />
 
 
     <ListView
-        android:id="@+id/result_list"
+        android:id="@+id/searchSongList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/search_field"
-        android:layout_marginTop="50dp"></ListView>
+        android:layout_marginTop="30dp"></ListView>
 
 </RelativeLayout>
-

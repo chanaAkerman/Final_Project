@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 public class SearchSongActivity extends AppCompatActivity {
     TextView searchField;
     ImageButton search;
+    ListView searchSongList;
 
     firebaseManager manager;
 
@@ -26,6 +28,7 @@ public class SearchSongActivity extends AppCompatActivity {
 
         searchField = (TextView)findViewById(R.id.search_field);
         search = (ImageButton) findViewById(R.id.search_btn);
+        searchSongList = (ListView)findViewById(R.id.searchSongList);
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -39,6 +42,7 @@ public class SearchSongActivity extends AppCompatActivity {
                     //creating adapter
                     SongsList songAdapter;
                     songAdapter = new SongsList(SearchSongActivity.this,songs);
+                    searchSongList.setAdapter(songAdapter);
                 }
             }
         });

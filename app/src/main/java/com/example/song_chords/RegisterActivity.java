@@ -42,6 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
                 }else {
                     User user = new User(email,pass);
                     int res = manager.saveUser(user);
+
                     if(res==0){
                         Toast.makeText(RegisterActivity.this, "User exist", Toast.LENGTH_LONG).show();
                     }else{

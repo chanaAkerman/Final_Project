@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         forgotPassword = (TextView)findViewById(R.id.text_view_forget_password);
 
         logIn = (Button)findViewById(R.id.button_sign_in);
+        //addSongs();
 
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,4 +126,39 @@ public class LoginActivity extends AppCompatActivity {
         new SendMailTask(LoginActivity.this).execute(fromEmail,
                 fromPassword, toEmailList, emailSubject, emailBody);
     }
+
+    public void addSongs(){
+        Song s1 = new Song("אם יש גן עדן", "אייל גולן", "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F.jpg?alt=media&token=949b1420-f567-48f9-8538-a2415b8c5fb4", "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%9D%20%D7%99%D7%A9%20%D7%92%D7%9F%20%D7%A2%D7%93%D7%9F%20-%20%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F.txt?alt=media&token=1687ea5d-2d27-48bd-82e7-f9ffe78ef2b5");
+
+      Song s2 = new Song("אבא", "שלומי שבת", null, "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%91%D7%90%20-%20%D7%A9%D7%9C%D7%95%D7%9E%D7%99%20%D7%A9%D7%91%D7%AA.txt?alt=media&token=a5efb5e8-e486-4bd7-9c06-797643a56200");
+     /*     Song s3 = new Song("אהבה קטנה", "שירי מימון", "gs://songchords-b38e1.appspot.com/ShiriMimon.jpg", "gs://songchords-b38e1.appspot.com/אהבה קטנה - שירי מימון.txt");
+        Song s4 = new Song("את לי הכל", "הראל סקעת", "gs://songchords-b38e1.appspot.com/HarelSkaat.jpg", "gs://songchords-b38e1.appspot.com/את לי הכל  - הראל סקעת.txt");
+        Song s5 = new Song("אושר לדקה", "אורי בן ארי", "", "");
+        Song s6 = new Song("אמא אם הייתי", "חנן בן ארי", "", "");
+        Song s7 = new Song("באתי לחלום", "נתן גושן", "", "");
+        Song s8 = new Song("בסוף כל יום", "אייל גולן", "", "");
+        Song s9 = new Song("כל מה שיש לי", "נתן גושן", "", "");
+        Song s10 = new Song("משהו ממני", "הראל סקעת", "", "");
+        Song s11 = new Song("מתנות קטנות", "רמי קלינשטיין", "", "");
+        Song s12 = new Song("עד שתחזור", "יובל דיין", "", "");
+        Song s13 = new Song("רצים באוויר", "גיא ויהל", "", "");
+        Song s14 = new Song("תוכו רצוף אהבה", "ישי ריבו", "", "");*/
+
+        manager.saveSong(s1);
+       manager.saveSong(s2);
+       /*   manager.saveSong(s3);
+        manager.saveSong(s4);
+
+        manager.saveSong(s5);
+        manager.saveSong(s6);
+        manager.saveSong(s7);
+        manager.saveSong(s8);
+        manager.saveSong(s9);
+        manager.saveSong(s10);
+        manager.saveSong(s11);
+        manager.saveSong(s12);
+        manager.saveSong(s13);
+        manager.saveSong(s14);*/
+    }
+
 }

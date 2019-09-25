@@ -1,4 +1,5 @@
 package com.example.song_chords;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.widget.ArrayAdapter;
 
@@ -7,7 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +32,18 @@ public class SongsList extends ArrayAdapter<Song> {
         LayoutInflater inflater = context.getLayoutInflater();
         View listViewItem = inflater.inflate(R.layout.songs_list, null, true);
 
+        ImageView imageViewSingerPic = (ImageView)listViewItem.findViewById(R.id.singerImage);
         TextView textViewSongName = (TextView) listViewItem.findViewById(R.id.textViewSongName);
         TextView textViewSingerName = (TextView) listViewItem.findViewById(R.id.textViewSingerName);
 
         Song song = songs.get(position);
 
-        textViewSongName.setText(textViewSongName.getText());
-        textViewSingerName.setText(textViewSingerName.getText());
+        textViewSongName.setText(song.getName());
+        textViewSingerName.setText(song.getSingerName());
+        if(song.getPictureRef()!=null) {
+            Glide.with(context).load(song.getPictureRef()).into(imageViewSingerPic);
+        }else
+            imageViewSingerPic.setImageResource(R.drawable.anonymous);
 
         return listViewItem;
     }

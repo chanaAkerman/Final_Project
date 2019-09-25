@@ -46,6 +46,11 @@ public class firebaseManager {
         return 0; // user exist
     }
 
+    public void saveSong(Song song) {
+        String id = songsRef.push().getKey();
+        songsRef.child(id).setValue(song);
+    }
+
     public boolean emailExist(String email) {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getEmail().equals(email))
@@ -94,7 +99,7 @@ public class firebaseManager {
 
     public void setSongsRef() {
         // Read from the database
-        usersRef.addValueEventListener(new ValueEventListener() {
+        songsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -112,6 +117,7 @@ public class firebaseManager {
             }
         });
     }
+
     public ArrayList<Song> getSongByName(String name){
         ArrayList<Song> song=null;
         for(int i=0; i<songs.size(); i++){

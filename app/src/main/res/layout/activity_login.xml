@@ -21,8 +21,8 @@
             android:layout_marginBottom="16dp"
             android:gravity="center_horizontal"
             android:text="Account Login"
-            android:textColor="#fff"
-            android:textSize="26sp"
+            android:textColor="#090808"
+            android:textSize="30sp"
             android:textStyle="bold"/>
 
         <RelativeLayout
