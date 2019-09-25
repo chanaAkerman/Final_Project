@@ -24,18 +24,21 @@ public class firebaseManager {
     public DatabaseReference usersRef;
     public DatabaseReference songsRef;
     public ArrayList<User> users;
+    public ArrayList<Song> songs;
 
-    public firebaseManager(){
-        this.database=FirebaseDatabase.getInstance();
-        this.usersRef=database.getReference("Users");
-        this.songsRef=database.getReference("songs");
+    public firebaseManager() {
+        this.database = FirebaseDatabase.getInstance();
+        this.usersRef = database.getReference("Users");
+        this.songsRef = database.getReference("Songs");
         users = new ArrayList<>();
+        songs = new ArrayList<>();
 
         setUsersRef();
+        setSongsRef();
     }
 
-    public int saveUser(User user){
-        if(!emailExist(user.email)) {
+    public int saveUser(User user) {
+        if (!emailExist(user.email)) {
             String id = usersRef.push().getKey();
             usersRef.child(id).setValue(user);
             return 1; // user added
@@ -43,24 +46,25 @@ public class firebaseManager {
         return 0; // user exist
     }
 
-    public boolean emailExist(String email){
-        for(int i=0; i<users.size(); i++){
-            if(users.get(i).getEmail().equals(email))
+    public boolean emailExist(String email) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getEmail().equals(email))
                 return true;
         }
         return false;
     }
 
-    public boolean userExist(User user){
-        for(int i=0; i<users.size(); i++){
-            if(users.get(i).equals(user))
+    public boolean userExist(User user) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).equals(user))
                 return true;
         }
         return false;
     }
-    public String getPassword(String email){
-        for(int i=0; i<users.size(); i++){
-            if(users.get(i).getEmail().equals(email))
+
+    public String getPassword(String email) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getEmail().equals(email))
                 return users.get(i).getPassword();
         }
         return null;
@@ -75,7 +79,7 @@ public class firebaseManager {
                 // whenever data at this location is updated.
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     User user = ds.getValue(User.class);
-                    if(!emailExist(user.getEmail()))
+                    if (!emailExist(user.getEmail()))
                         users.add(user);
                 }
             }
@@ -88,4 +92,34 @@ public class firebaseManager {
         });
     }
 
+    public void setSongsRef() {
+        // Read from the database
+        usersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Song song = ds.getValue(Song.class);
+                    songs.add(song);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Failed to read value
+                Log.w("Failed to read value.", databaseError.toException());
+            }
+        });
+    }
+    public ArrayList<Song> getSongByName(String name){
+        ArrayList<Song> song=null;
+        for(int i=0; i<songs.size(); i++){
+            if(songs.get(i).getName().equals(name)){
+                if(song==null) {song = new ArrayList<>();}
+                song.add(songs.get(i));
+            }
+        }
+        return song;
+    }
 }

@@ -50,7 +50,10 @@ public class LoginActivity extends AppCompatActivity {
                 }else if(pass=="") {
                     Toast.makeText(LoginActivity.this, "Please enter password!", Toast.LENGTH_LONG).show();
                 }else if(manager.userExist(user)){
-                    Toast.makeText(LoginActivity.this, "User exist", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(LoginActivity.this, "User exist", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(LoginActivity.this,SearchSongActivity.class);
+                    startActivity(intent);
+                    finish();
                 }else{
                     Toast.makeText(LoginActivity.this, "User not exist", Toast.LENGTH_LONG).show();
                 }
