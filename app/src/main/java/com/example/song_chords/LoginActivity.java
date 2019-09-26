@@ -21,14 +21,14 @@ public class LoginActivity extends AppCompatActivity {
     TextView forgotPassword;
     Button logIn;
 
-    firebaseManager manager;
+    FirebaseManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        manager = new firebaseManager();
+        manager = new FirebaseManager();
 
         register = (TextView)findViewById(R.id.text_view_register);
         textEmail = (TextView)findViewById(R.id.text_email);
@@ -135,13 +135,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void addSongs(){
-        Song s1 = new Song("אם יש גן עדן", "אייל גולן","https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F.jpg?alt=media&token=a8dc8647-2d55-451b-8a5c-0ab33db3f0ef",
-                "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%9D%20%D7%99%D7%A9%20%D7%92%D7%9F%20%D7%A2%D7%93%D7%9F.txt?alt=media&token=e201ecbb-1a87-40b4-9246-01a41d19444f");
-
-
-        Song s2 = new Song("אבא", "שלומי שבת", null, "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%91%D7%90.txt?alt=media&token=8449b498-079a-4e3c-863e-8063fc654b82");
-     /*     Song s3 = new Song("אהבה קטנה", "שירי מימון", "gs://songchords-b38e1.appspot.com/ShiriMimon.jpg", "gs://songchords-b38e1.appspot.com/אהבה קטנה - שירי מימון.txt");
-        Song s4 = new Song("את לי הכל", "הראל סקעת", "gs://songchords-b38e1.appspot.com/HarelSkaat.jpg", "gs://songchords-b38e1.appspot.com/את לי הכל  - הראל סקעת.txt");
+        Song s1 = new Song("אם יש גן עדן", "אייל גולן","","");
+        Song s3 = new Song("אהבה קטנה", "שירי מימון", "", "");
+        Song s4 = new Song("את לי הכל", "הראל סקעת", "", "");
         Song s5 = new Song("אושר לדקה", "אורי בן ארי", "", "");
         Song s6 = new Song("אמא אם הייתי", "חנן בן ארי", "", "");
         Song s7 = new Song("באתי לחלום", "נתן גושן", "", "");
@@ -151,13 +147,11 @@ public class LoginActivity extends AppCompatActivity {
         Song s11 = new Song("מתנות קטנות", "רמי קלינשטיין", "", "");
         Song s12 = new Song("עד שתחזור", "יובל דיין", "", "");
         Song s13 = new Song("רצים באוויר", "גיא ויהל", "", "");
-        Song s14 = new Song("תוכו רצוף אהבה", "ישי ריבו", "", "");*/
+        Song s14 = new Song("תוכו רצוף אהבה", "ישי ריבו", "", "");
 
         manager.saveSong(s1);
-       manager.saveSong(s2);
-       /*   manager.saveSong(s3);
+        manager.saveSong(s3);
         manager.saveSong(s4);
-
         manager.saveSong(s5);
         manager.saveSong(s6);
         manager.saveSong(s7);
@@ -167,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
         manager.saveSong(s11);
         manager.saveSong(s12);
         manager.saveSong(s13);
-        manager.saveSong(s14);*/
+        manager.saveSong(s14);
     }
 
 }

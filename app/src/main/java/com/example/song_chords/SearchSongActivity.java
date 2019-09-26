@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,14 +22,14 @@ public class SearchSongActivity extends AppCompatActivity {
     ListView searchSongList;
     ArrayList<Song> songs;
 
-    firebaseManager manager;
+    FirebaseManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_song);
 
-        manager = new firebaseManager();
+        manager = new FirebaseManager();
         songs = new ArrayList<>();
 
         searchField = (TextView)findViewById(R.id.search_field);
@@ -55,7 +54,6 @@ public class SearchSongActivity extends AppCompatActivity {
             }
         });
 
-        //Show Map when User click on other player- show player location
         searchSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

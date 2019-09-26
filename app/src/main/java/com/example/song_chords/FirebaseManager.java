@@ -18,7 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class firebaseManager {
+public class FirebaseManager {
     // Write a message to the database
     public FirebaseDatabase database;
     public DatabaseReference usersRef;
@@ -26,7 +26,7 @@ public class firebaseManager {
     public ArrayList<User> users;
     public ArrayList<Song> songs;
 
-    public firebaseManager() {
+    public FirebaseManager() {
         this.database = FirebaseDatabase.getInstance();
         this.usersRef = database.getReference("Users");
         this.songsRef = database.getReference("Songs");

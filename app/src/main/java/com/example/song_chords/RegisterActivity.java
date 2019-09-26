@@ -15,13 +15,13 @@ public class RegisterActivity extends AppCompatActivity {
     TextView password;
     Button register;
 
-    firebaseManager manager;
+    FirebaseManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        manager = new firebaseManager();
+        manager = new FirebaseManager();
 
 
         login = (TextView)findViewById(R.id.text_view_login);

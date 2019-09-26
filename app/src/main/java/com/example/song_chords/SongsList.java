@@ -40,7 +40,7 @@ public class SongsList extends ArrayAdapter<Song> {
 
         textViewSongName.setText(song.getName());
         textViewSingerName.setText("   "+song.getSingerName());
-        if(song.getPictureRef()!=null){
+        if(song.getPictureRef()!=""){
             imageViewSingerPic.setBackground(null);
             Glide.with(context).load(song.getPictureRef()).into(imageViewSingerPic);
         }

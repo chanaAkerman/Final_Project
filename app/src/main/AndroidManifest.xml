@@ -3,6 +3,9 @@
     package="com.example.song_chords">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature
+        android:name="android.hardware.Camera2"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -11,10 +14,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".VideoPlayActivity"></activity>
         <activity
             android:name=".SongActivity"
             android:label="@string/title_activity_song"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".SearchSongActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity">
