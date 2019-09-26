@@ -41,22 +41,27 @@ public class LoginActivity extends AppCompatActivity {
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = textEmail.getText()+"";
-                String pass = password.getText()+"";
+                String email = textEmail.getText() + "";
+                String pass = password.getText() + "";
 
-                User user = new User(email,pass);
+                User user = new User(email, pass);
 
-                if(email=="") {
+                if (email == "") {
                     Toast.makeText(LoginActivity.this, "Please enter email address!", Toast.LENGTH_LONG).show();
-                }else if(pass=="") {
+                } else if (pass == "") {
                     Toast.makeText(LoginActivity.this, "Please enter password!", Toast.LENGTH_LONG).show();
-                }else if(manager.userExist(user)){
-                    //Toast.makeText(LoginActivity.this, "User exist", Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(LoginActivity.this,SearchSongActivity.class);
-                    startActivity(intent);
-                    finish();
-                }else{
-                    Toast.makeText(LoginActivity.this, "User not exist", Toast.LENGTH_LONG).show();
+
+                } else {
+                    if (manager.userExist(user)) {
+                        //Toast.makeText(LoginActivity.this, "User exist", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(LoginActivity.this, SearchSongActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else if (manager.emailExist(user.getEmail())) {
+                        Toast.makeText(LoginActivity.this, "Wrong Password", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
@@ -70,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                     sendMessage(email,pass);
                     //sendMessage2(email,pass);
                     Toast.makeText(LoginActivity.this, "your Password sent to your Email address", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -128,9 +135,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void addSongs(){
-        Song s1 = new Song("אם יש גן עדן", "אייל גולן", "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F.jpg?alt=media&token=949b1420-f567-48f9-8538-a2415b8c5fb4", "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%9D%20%D7%99%D7%A9%20%D7%92%D7%9F%20%D7%A2%D7%93%D7%9F%20-%20%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F.txt?alt=media&token=1687ea5d-2d27-48bd-82e7-f9ffe78ef2b5");
+        Song s1 = new Song("אם יש גן עדן", "אייל גולן","https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%99%D7%99%D7%9C%20%D7%92%D7%95%D7%9C%D7%9F.jpg?alt=media&token=a8dc8647-2d55-451b-8a5c-0ab33db3f0ef",
+                "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%9D%20%D7%99%D7%A9%20%D7%92%D7%9F%20%D7%A2%D7%93%D7%9F.txt?alt=media&token=e201ecbb-1a87-40b4-9246-01a41d19444f");
 
-      Song s2 = new Song("אבא", "שלומי שבת", null, "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%91%D7%90%20-%20%D7%A9%D7%9C%D7%95%D7%9E%D7%99%20%D7%A9%D7%91%D7%AA.txt?alt=media&token=a5efb5e8-e486-4bd7-9c06-797643a56200");
+
+        Song s2 = new Song("אבא", "שלומי שבת", null, "https://firebasestorage.googleapis.com/v0/b/songchords-b38e1.appspot.com/o/%D7%90%D7%91%D7%90.txt?alt=media&token=8449b498-079a-4e3c-863e-8063fc654b82");
      /*     Song s3 = new Song("אהבה קטנה", "שירי מימון", "gs://songchords-b38e1.appspot.com/ShiriMimon.jpg", "gs://songchords-b38e1.appspot.com/אהבה קטנה - שירי מימון.txt");
         Song s4 = new Song("את לי הכל", "הראל סקעת", "gs://songchords-b38e1.appspot.com/HarelSkaat.jpg", "gs://songchords-b38e1.appspot.com/את לי הכל  - הראל סקעת.txt");
         Song s5 = new Song("אושר לדקה", "אורי בן ארי", "", "");

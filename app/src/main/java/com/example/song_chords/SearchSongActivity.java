@@ -2,8 +2,10 @@ package com.example.song_chords;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -13,9 +15,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class SearchSongActivity extends AppCompatActivity {
+    public static final String EXTRA_SONG_LINK = "com.example.application.song_chords.EXTRA_SONG_LINK";
+    public static final String EXTRA_SONG_NAME = "com.example.application.song_chords.EXTRA_SONG_NAME";
+
     TextView searchField;
     ImageButton search;
     ListView searchSongList;
+    ArrayList<Song> songs;
 
     firebaseManager manager;
 
@@ -25,6 +31,7 @@ public class SearchSongActivity extends AppCompatActivity {
         setContentView(R.layout.activity_search_song);
 
         manager = new firebaseManager();
+        songs = new ArrayList<>();
 
         searchField = (TextView)findViewById(R.id.search_field);
         search = (ImageButton) findViewById(R.id.search_btn);
@@ -34,11 +41,12 @@ public class SearchSongActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String songToSearch = searchField.getText()+"";
-                ArrayList<Song> songs = new ArrayList<>();
                 songs = manager.getSongByName(songToSearch);
-                if(songs==null)
+
+                if(songs==null) {
                     Toast.makeText(SearchSongActivity.this, "Song Not Found", Toast.LENGTH_LONG).show();
-                else{
+                    searchSongList.setAdapter(null);
+                }else{
                     //creating adapter
                     SongsList songAdapter;
                     songAdapter = new SongsList(SearchSongActivity.this,songs);
@@ -46,8 +54,26 @@ public class SearchSongActivity extends AppCompatActivity {
                 }
             }
         });
-    }
 
-    public void showListOfSongs(String songToSearch) {
+        //Show Map when User click on other player- show player location
+        searchSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //getting the selected artist
+                Song song = songs.get(i);
+
+                //creating an intent
+                Intent intent = new Intent(SearchSongActivity.this,SongActivity.class);
+
+                //putting artist name and id to intent
+                intent.putExtra(EXTRA_SONG_LINK, song.getChordsRef());
+                intent.putExtra(EXTRA_SONG_NAME, song.getName());
+
+                //starting the activity with intent
+                startActivity(intent);
+
+                finish();
+            }
+        });
     }
 }

@@ -39,11 +39,11 @@ public class SongsList extends ArrayAdapter<Song> {
         Song song = songs.get(position);
 
         textViewSongName.setText(song.getName());
-        textViewSingerName.setText(song.getSingerName());
-        if(song.getPictureRef()!=null) {
+        textViewSingerName.setText("   "+song.getSingerName());
+        if(song.getPictureRef()!=null){
+            imageViewSingerPic.setBackground(null);
             Glide.with(context).load(song.getPictureRef()).into(imageViewSingerPic);
-        }else
-            imageViewSingerPic.setImageResource(R.drawable.anonymous);
+        }
 
         return listViewItem;
     }
