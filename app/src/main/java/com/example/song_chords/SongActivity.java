@@ -81,8 +81,6 @@ public class SongActivity extends AppCompatActivity {
         //chordsRef = (TextView) findViewById(R.id.chords);
         pdfView = (PDFView) findViewById(R.id.pdfView);
 
-
-
         Intent intent =  getIntent();
         final String txtFileUrl = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_LINK);
         String name = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_NAME);

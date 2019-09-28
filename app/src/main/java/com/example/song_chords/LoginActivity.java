@@ -15,13 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
-    TextView register;
-    TextView textEmail;
-    TextView password;
-    TextView forgotPassword;
-    Button logIn;
+    public TextView register;
+    public TextView textEmail;
+    public TextView password;
+    public TextView forgotPassword;
+    public Button logIn;
 
-    FirebaseManager manager;
+    public FirebaseManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +38,14 @@ public class LoginActivity extends AppCompatActivity {
         logIn = (Button)findViewById(R.id.button_sign_in);
         //addSongs();
 
+        setLogInAction();
+
+        setForgotPasswordAction();
+
+        setRegisterAction();
+
+    }
+    public void setLogInAction(){
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,17 +55,18 @@ public class LoginActivity extends AppCompatActivity {
                 User user = new User(email, pass);
 
                 if (email == "") {
-                    Toast.makeText(LoginActivity.this, "Please enter email address!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Please enter an email address!", Toast.LENGTH_LONG).show();
                 } else if (pass == "") {
                     Toast.makeText(LoginActivity.this, "Please enter password!", Toast.LENGTH_LONG).show();
 
                 } else {
                     if (manager.userExist(user)) {
-                        //Toast.makeText(LoginActivity.this, "User exist", Toast.LENGTH_LONG).show();
+                        // User exist, start new activity
                         Intent intent = new Intent(LoginActivity.this, SearchSongActivity.class);
                         startActivity(intent);
                         finish();
                     } else if (manager.emailExist(user.getEmail())) {
+                        // wrong password
                         Toast.makeText(LoginActivity.this, "Wrong Password", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
@@ -65,7 +74,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    public void setForgotPasswordAction(){
         forgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,24 +85,25 @@ public class LoginActivity extends AppCompatActivity {
                     String pass = manager.getPassword(email);
                     sendMessage(email,pass);
                     //sendMessage2(email,pass);
-                    Toast.makeText(LoginActivity.this, "your Password sent to your Email address", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "Password sent to your Email address", Toast.LENGTH_LONG).show();
                 }else{
                     Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
                 }
             }
         });
+    }
 
+    public void setRegisterAction(){
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
-
     }
+
     public void sendMessage(final String email,final String pass) {
         final ProgressDialog dialog = new ProgressDialog(LoginActivity.this);
         dialog.setTitle("Sending Email");

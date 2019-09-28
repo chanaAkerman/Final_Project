@@ -10,25 +10,41 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
-    TextView login;
-    TextView textEmail;
-    TextView password;
-    Button register;
+    public TextView login;
+    public TextView textEmail;
+    public TextView password;
+    public Button register;
 
-    FirebaseManager manager;
+    public FirebaseManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        manager = new FirebaseManager();
 
+        manager = new FirebaseManager();
 
         login = (TextView)findViewById(R.id.text_view_login);
         textEmail = (TextView)findViewById(R.id.text_email);
         password = (TextView)findViewById(R.id.edit_text_password);
         register = (Button)findViewById(R.id.button_register);
 
+        setRegisterAction();
+        setLoginAction();
+    }
+
+    private void setLoginAction() {
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent  = new Intent(RegisterActivity.this,LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+    }
+
+    private void setRegisterAction(){
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,15 +69,6 @@ public class RegisterActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 }
-            }
-        });
-
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent  = new Intent(RegisterActivity.this,LoginActivity.class);
-                startActivity(intent);
-                finish();
             }
         });
     }
