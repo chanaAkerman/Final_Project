@@ -47,6 +47,18 @@
                     android:layout_alignParentRight="true"
                     android:background="@drawable/ic_camera" />
 
+                <TextView
+                    android:id="@+id/recording_label"
+                    android:gravity="left"
+                    android:text="Recording..."
+                    android:visibility="invisible"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/btn_record"
+                    android:layout_marginTop="35dp"
+                    android:textColor="#FF001B"
+                    android:textSize="15dp"/>
+
                 <Button
                     android:id="@+id/btn_record"
                     android:layout_width="70dp"
@@ -54,8 +66,19 @@
                     android:layout_alignParentLeft="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="10dp"
-                    android:layout_marginRight="116dp"
+                    android:layout_marginRight="10dp"
                     android:background="@drawable/ic_record" />
+
+                <Chronometer
+                    android:id="@+id/simpleChronometer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btn_record"
+                    android:layout_alignParentLeft="true"
+                    android:visibility="invisible"
+                    android:paddingLeft="25dp"
+                    android:gravity="right"
+                    android:textColor="#030303"/>
 
             </RelativeLayout>
 

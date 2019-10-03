@@ -1,22 +1,31 @@
 package com.example.song_chords;
 
+import android.provider.MediaStore;
+
 import java.util.ArrayList;
 
 public class User {
     public String id;
     public String email;
     public String password;
-    protected ArrayList<String> videoList;
-    protected ArrayList<String> recordingList;
+    public ArrayList<Audio> audioList;
+    public ArrayList<Video> videoList;
 
     public User(){ }
 
     public User(String email,String password){
         this.email=email;
         this.password =password;
-        this.videoList =null;
-        this.recordingList =null;
-        this.recordingList =new ArrayList<>();
+        this.audioList =new ArrayList<>();
+        this.videoList =new ArrayList<>();
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getEmail() {
@@ -35,45 +44,36 @@ public class User {
         this.password = password;
     }
 
-    public ArrayList<String> getVideoList() {
+    public ArrayList<Audio> getAudioList() {
+        return audioList;
+    }
+
+    public ArrayList<Video> getVideoList() {
         return videoList;
     }
 
-    public ArrayList<String> getRecordingList() {
-        return recordingList;
-    }
-
-    public void setVideoList(ArrayList<String> videoList) {
+    public void setVideoList(ArrayList<Video> videoList) {
         this.videoList = videoList;
     }
 
-    public void setRecordingList(ArrayList<String> recordingList) {
-        this.recordingList = recordingList;
+    public void setAudioList(ArrayList<Audio> audioList) {
+        this.audioList=audioList;
     }
 
-    public void addVideoUrl(String url){
-        if(this.videoList==null)
-            this.videoList=new ArrayList<>();
-        this.videoList.add(url);
+    public void clearAudioList(){
+        this.audioList.clear();
     }
 
-    public void addRecordingUrl(String url){
-        if(this.recordingList==null)
-            this.recordingList=new ArrayList<>();
-        this.recordingList.add(url);
-    }
-
-    public void clearRecordindData(){
-        this.recordingList.clear();
-    }
-
-    public void clearVideoData(){
+    public void clearVideoList(){
         this.videoList.clear();
     }
 
     @Override
     public String toString() {
-        return "[ "+email+", "+password+" ]";
+        int vSize=0,aSize=0;
+        if(videoList!=null){ vSize=videoList.size();}
+        if(audioList!=null){ aSize=audioList.size();}
+        return "[ "+id+", "+email+", "+password+" audioSize: "+aSize +" videoSize: "+vSize +"]";
     }
 
     @Override

@@ -14,20 +14,26 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class SearchSongActivity extends AppCompatActivity {
+    public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
+
     public static final String EXTRA_SONG_LINK = "com.example.application.song_chords.EXTRA_SONG_LINK";
     public static final String EXTRA_SONG_NAME = "com.example.application.song_chords.EXTRA_SONG_NAME";
 
-    TextView searchField;
-    ImageButton search;
-    ListView searchSongList;
-    ArrayList<Song> songs;
+    public TextView searchField;
+    public ImageButton search;
+    public ListView searchSongList;
+    public ArrayList<Song> songs;
 
-    FirebaseManager manager;
+    public FirebaseManager manager;
+    public String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_song);
+
+        Intent intent = getIntent();
+        userId=intent.getStringExtra(MenuActivity.EXTRA_USER_ID);
 
         manager = new FirebaseManager();
         songs = new ArrayList<>();
@@ -36,6 +42,13 @@ public class SearchSongActivity extends AppCompatActivity {
         search = (ImageButton) findViewById(R.id.search_btn);
         searchSongList = (ListView)findViewById(R.id.searchSongList);
 
+        setSearchAction();
+
+        // on click listener handler
+        setSearchSongListAction();
+
+    }
+    public void setSearchAction(){
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,7 +66,9 @@ public class SearchSongActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
+    public void setSearchSongListAction(){
         searchSongList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -66,6 +81,7 @@ public class SearchSongActivity extends AppCompatActivity {
                 //putting artist name and id to intent
                 intent.putExtra(EXTRA_SONG_LINK, song.getChordsRef());
                 intent.putExtra(EXTRA_SONG_NAME, song.getName());
+                intent.putExtra(EXTRA_USER_ID, userId);
 
                 //starting the activity with intent
                 startActivity(intent);

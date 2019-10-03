@@ -11,10 +11,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
+    public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
     public TextView register;
     public TextView textEmail;
     public TextView password;
@@ -28,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // initialize
         manager = new FirebaseManager();
 
         register = (TextView)findViewById(R.id.text_view_register);
@@ -62,12 +65,14 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     if (manager.userExist(user)) {
                         // User exist, start new activity
-                        Intent intent = new Intent(LoginActivity.this, SearchSongActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+                        intent.putExtra(EXTRA_USER_ID, manager.getUserKey(user));
                         startActivity(intent);
                         finish();
                     } else if (manager.emailExist(user.getEmail())) {
                         // wrong password
                         Toast.makeText(LoginActivity.this, "Wrong Password", Toast.LENGTH_LONG).show();
+                        overridePendingTransition(R.anim.rotate,R.anim.blink);
                     } else {
                         Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
                     }

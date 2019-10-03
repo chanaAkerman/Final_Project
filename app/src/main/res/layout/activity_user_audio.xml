@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#E3D7F5"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UserAudio">
+
+    <TextView
+        android:id="@+id/audio_title"
+        android:text="Recording"
+        android:textColor="#CB09EC"
+        android:textSize="18dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/black"
+        android:layout_below="@id/audio_title"/>
+
+    <TextView
+        android:id="@+id/no_recordings"
+        android:text="No recordings found"
+        android:textSize="15dp"
+        android:gravity="center"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/audio_title"/>
+
+    <ListView
+        android:id="@+id/audio_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/audio_title">
+    </ListView>
+
+</RelativeLayout>

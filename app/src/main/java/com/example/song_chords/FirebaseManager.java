@@ -1,12 +1,6 @@
 package com.example.song_chords;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.nfc.Tag;
-import android.provider.ContactsContract;
-import android.se.omapi.Session;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -35,10 +29,53 @@ public class FirebaseManager {
         setUsersRef();
         setSongsRef();
     }
+    public FirebaseManager refresh(){
+        return new FirebaseManager();
+    }
+
+    public void updateUser(String id, Audio newAudio) {
+        User user = getUserByKey(id);
+        // remove old user
+        users.remove(user);
+
+        ArrayList<Audio> audioArrayList = user.getAudioList();
+        if (audioArrayList == null) {
+            audioArrayList = new ArrayList<>();
+        }
+        audioArrayList.add(newAudio);
+        user.setAudioList(audioArrayList);
+
+        // add updated user
+        users.add(user);
+    }
+
+    public void AddAudio(final String id, Audio newAudio) {
+        updateUser(id, newAudio);
+
+        User user = getUserByKey(id);
+        final ArrayList<Audio> updated = user.getAudioList();
+
+
+        // Update in firebase
+        usersRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (int i = 0; i < updated.size(); i++) {
+                    dataSnapshot.getRef().child("AudioList").child(i + "").setValue(updated.get(i));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("User", databaseError.getMessage());
+            }
+        });
+    }
 
     public int saveUser(User user) {
         if (!emailExist(user.email)) {
             String id = usersRef.push().getKey();
+            user.setId(id);
             usersRef.child(id).setValue(user);
             return 1; // user added
         }
@@ -66,6 +103,23 @@ public class FirebaseManager {
         return false;
     }
 
+    public String getUserKey(User user) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).equals(user))
+                return users.get(i).getId();
+        }
+        return null;
+    }
+
+    public User getUserByKey(String id) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getId().equals(id)) {
+                return users.get(i);
+            }
+        }
+        return null;
+    }
+
     public String getPassword(String email) {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getEmail().equals(email))
@@ -80,11 +134,26 @@ public class FirebaseManager {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
-                // whenever data at this location is updated.
+                // whenever data at this location is updated.videoList = null
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     User user = ds.getValue(User.class);
-                    if (!emailExist(user.getEmail()))
+
+                    // fetch audio
+                    int number = (int)ds.child("AudioList").getChildrenCount();
+                    ArrayList<Audio> audioArrayList = null;
+                    if(number!=0) {
+                        audioArrayList=new ArrayList<>();
+                        for (int j = 0; j < number; j++) {
+                            Audio audio = ds.child("AudioList").child(j+"").getValue(Audio.class);
+                            audioArrayList.add(audio);
+                        }
+                    }
+                    user.setAudioList(audioArrayList);
+
+                    // add to local array
+                    if (!emailExist(user.getEmail())) {
                         users.add(user);
+                    }
                 }
             }
 
@@ -117,14 +186,43 @@ public class FirebaseManager {
         });
     }
 
-    public ArrayList<Song> getSongByName(String name){
-        ArrayList<Song> song=null;
-        for(int i=0; i<songs.size(); i++){
-            if(songs.get(i).getName().equals(name)){
-                if(song==null) {song = new ArrayList<>();}
+    public ArrayList<Song> getSongByName(String name) {
+        ArrayList<Song> song = null;
+        for (int i = 0; i < songs.size(); i++) {
+            if (songs.get(i).getName().equals(name)) {
+                if (song == null) {
+                    song = new ArrayList<>();
+                }
                 song.add(songs.get(i));
             }
         }
         return song;
     }
+
+    public ArrayList<Audio> getAudioListOfUser(String id) {
+        refresh();
+        User currentUser = new User();
+
+        for (int i = 0; i < users.size(); i++) {
+            if(users.get(i).getId().equals(id)){
+                currentUser = users.get(i);
+            }
+        }
+        if (currentUser == null) {
+            //user not exist
+            return null;
+        }
+        ArrayList<Audio> current = currentUser.getAudioList();
+        return current;
+    }
+
+    public ArrayList<Video> getVideoListOfUser(String id) {
+        User currentUser = getUserByKey(id);
+        if (currentUser == null) {
+            return null;
+        }
+        ArrayList<Video> current = currentUser.getVideoList();
+        return current;
+    }
+
 }
