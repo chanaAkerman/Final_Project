@@ -1,5 +1,6 @@
 package com.example.song_chords;
 
+import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -29,11 +30,7 @@ public class FirebaseManager {
         setUsersRef();
         setSongsRef();
     }
-    public FirebaseManager refresh(){
-        return new FirebaseManager();
-    }
-
-    public void updateUser(String id, Audio newAudio) {
+    public void updateUserAudio(String id, Audio newAudio) {
         User user = getUserByKey(id);
         // remove old user
         users.remove(user);
@@ -49,8 +46,24 @@ public class FirebaseManager {
         users.add(user);
     }
 
+    public void updateUserVideo(String id, Video newVideo) {
+        User user = getUserByKey(id);
+        // remove old user
+        users.remove(user);
+
+        ArrayList<Video> videoArrayList = user.getVideoList();
+        if (videoArrayList == null) {
+            videoArrayList = new ArrayList<>();
+        }
+        videoArrayList.add(newVideo);
+        user.setVideoList(videoArrayList);
+
+        // add updated user
+        users.add(user);
+    }
+
     public void AddAudio(final String id, Audio newAudio) {
-        updateUser(id, newAudio);
+        updateUserAudio(id, newAudio);
 
         User user = getUserByKey(id);
         final ArrayList<Audio> updated = user.getAudioList();
@@ -62,6 +75,29 @@ public class FirebaseManager {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (int i = 0; i < updated.size(); i++) {
                     dataSnapshot.getRef().child("AudioList").child(i + "").setValue(updated.get(i));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("User", databaseError.getMessage());
+            }
+        });
+    }
+
+    public void AddVideo(final String id, Video newVideo) {
+        updateUserVideo(id, newVideo);
+
+        User user = getUserByKey(id);
+        final ArrayList<Video> updated = user.getVideoList();
+
+
+        // Update in firebase
+        usersRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (int i = 0; i < updated.size(); i++) {
+                    dataSnapshot.getRef().child("VideoList").child(i + "").setValue(updated.get(i));
                 }
             }
 
@@ -150,6 +186,18 @@ public class FirebaseManager {
                     }
                     user.setAudioList(audioArrayList);
 
+                    // fetch video
+                    number = (int)ds.child("VideoList").getChildrenCount();
+                    ArrayList<Video> videoArrayList = null;
+                    if(number!=0) {
+                        videoArrayList=new ArrayList<>();
+                        for (int j = 0; j < number; j++) {
+                            Video video = ds.child("VideoList").child(j+"").getValue(Video.class);
+                            videoArrayList.add(video);
+                        }
+                    }
+                    user.setVideoList(videoArrayList);
+
                     // add to local array
                     if (!emailExist(user.getEmail())) {
                         users.add(user);
@@ -200,7 +248,6 @@ public class FirebaseManager {
     }
 
     public ArrayList<Audio> getAudioListOfUser(String id) {
-        refresh();
         User currentUser = new User();
 
         for (int i = 0; i < users.size(); i++) {
@@ -217,8 +264,15 @@ public class FirebaseManager {
     }
 
     public ArrayList<Video> getVideoListOfUser(String id) {
-        User currentUser = getUserByKey(id);
+        User currentUser = new User();
+
+        for (int i = 0; i < users.size(); i++) {
+            if(users.get(i).getId().equals(id)){
+                currentUser = users.get(i);
+            }
+        }
         if (currentUser == null) {
+            //user not exist
             return null;
         }
         ArrayList<Video> current = currentUser.getVideoList();

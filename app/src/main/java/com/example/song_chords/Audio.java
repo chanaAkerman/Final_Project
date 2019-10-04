@@ -32,6 +32,6 @@ public class Audio {
 
     @Override
     public String toString() {
-        return "[ Reording "+name+", F.Reference"+ref+", time:"+duration+" ]";
+        return "[ Audio Recording "+name+", F.Reference"+ref+", time:"+duration+" ]";
     }
 }

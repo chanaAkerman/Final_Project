@@ -5,17 +5,13 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Camera;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.github.barteksc.pdfviewer.PDFView;
-import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -24,11 +20,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.os.Environment;
 import android.os.SystemClock;
@@ -36,10 +32,7 @@ import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -54,12 +47,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
-public class SongActivity extends AppCompatActivity{
+public class SongActivity extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
 
     public static final String EXTRA_SONG_LINK = "com.example.application.song_chords.EXTRA_SONG_LINK";
@@ -68,8 +58,6 @@ public class SongActivity extends AppCompatActivity{
 
     public static final String LOG_TAG = "ERROR";
 
-    private final int REQUEST_CODE = 101;
-    private final int VIDEO_CAPTURE = 101;
     private final int RESPONSE_CODE = 200;
     static final int REQUEST_VIDEO_CAPTURE = 1;
 
@@ -87,16 +75,9 @@ public class SongActivity extends AppCompatActivity{
 
     private StorageReference storageReference;
 
-    public String fileName;
-    public String fileNameVideo = null;
-    public String video = null;
+    public File fileNameVideo = null;
     public String fileNameAudio = null;
-    public String audio = null;
 
-    public File mediaFile = null;
-
-    public MediaRecorder mediaRecorder;
-    public SurfaceHolder holder;
     boolean recording = false;
     private MediaRecorder recorder = null;
     private ProgressDialog progressDialog;
@@ -108,9 +89,10 @@ public class SongActivity extends AppCompatActivity{
 
 
     // Requesting permission to RECORD_AUDIO
-    private boolean permissionToRecordAccepted = false;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private boolean permissionRecordVideoAccepted = true;
+    private boolean permissionRecordAudioAccepted = true;
+    private static final int PERMISSION_REQUEST_CODE = 200;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,29 +109,35 @@ public class SongActivity extends AppCompatActivity{
                         .setAction("Action", null).show();
             }
         });
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-
-        simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer); // initiate a chronometer
-
-        // Dialog
-        progressDialog = new ProgressDialog(SongActivity.this);
-        // Firebase manager
-        manager = new FirebaseManager();
-
         // get variables from previous activity
         Intent intent = getIntent();
         final String txtFileUrl = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_LINK);
         String name = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_NAME);
         userId = intent.getStringExtra(SearchSongActivity.EXTRA_USER_ID);
 
+
+        //Permissions
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE},
+                PERMISSION_REQUEST_CODE);
+        checkPermission();
+
+        simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer); // initiate a chronometer
+
+        // Dialog
+        progressDialog = new ProgressDialog(SongActivity.this);
+
+        // Firebase manager
+        manager = new FirebaseManager();
         // Storage reference
         storageReference = FirebaseStorage.getInstance().getReference();
 
         fileNameAudio = getExternalCacheDir().getAbsolutePath();
-        fileNameVideo = getExternalCacheDir().getAbsolutePath();
         try {
             fileNameAudio += "/" + createTransactionID() + ".3gp";
-            fileNameVideo += "/" + createTransactionID() + ".mp4";
         } catch (Exception e) {
             Log.e(LOG_TAG, "Generate name");
         }
@@ -191,10 +179,25 @@ public class SongActivity extends AppCompatActivity{
         return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 
+    public void checkPermission() {
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED)) {
+            permissionRecordVideoAccepted = false;
+        }
+
+        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                == PackageManager.PERMISSION_GRANTED)) {
+            permissionRecordAudioAccepted = false;
+        }
+    }
+
+
+
     // Camera Session
+
     private boolean hasCamera() {
         if (getPackageManager().hasSystemFeature(
-                PackageManager.FEATURE_CAMERA_FRONT)){
+                PackageManager.FEATURE_CAMERA_FRONT)) {
             return true;
         } else {
             return false;
@@ -205,10 +208,14 @@ public class SongActivity extends AppCompatActivity{
         activateCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(hasCamera())
-                    RecordingVideo();
-                else {
-                    Toast.makeText(SongActivity.this, "Device does not support Camera", Toast.LENGTH_LONG).show();
+                if (permissionRecordVideoAccepted) {
+                    if (hasCamera())
+                        RecordingVideo();
+                    else {
+                        Toast.makeText(SongActivity.this, "Device does not support Camera", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(SongActivity.this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -217,16 +224,13 @@ public class SongActivity extends AppCompatActivity{
 
     public void RecordingVideo() {
         try {
-            mediaFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + "/" + createTransactionID() + ".mp4");
+            fileNameVideo = new File(getExternalCacheDir().getAbsolutePath()+ "/" + createTransactionID() + ".mp4");
 
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Media name");
+            Log.e(LOG_TAG, "failed to create file name video");
         }
-        if(mediaFile!=null){
+        if (fileNameVideo != null) {
             Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-            Uri videoUri = Uri.fromFile(mediaFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
 
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
@@ -244,40 +248,58 @@ public class SongActivity extends AppCompatActivity{
     }
 
     public void showAlertAndSaveVideo() {
-        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Video name & Save Video");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        uploadVideoTo();
-                        break;
-
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        //Do nothing
-                        break;
+                if (input.getText().toString().equals("")) {
+                    // generate name
+                    uploadVideo("");
+                } else {
+                    String name = input.getText().toString();
+                    uploadVideo(name);
                 }
             }
-        };
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Save video?").setPositiveButton("Yes", dialogClickListener)
-                .setNegativeButton("No", dialogClickListener).show();
+        builder.show();
     }
 
-    public void uploadVideoTo() {
-        progressDialog.setMessage("Uploading Video...");
+    public void uploadVideo(String name) {
+        progressDialog.setMessage("Uploading Video..");
         progressDialog.show();
 
-        StorageReference filePath = storageReference.child("Video").child(video);
-        videoUri = Uri.fromFile(mediaFile);
+        if (name == "") {
+            try {
+                name = createTransactionID();
+            } catch (Exception e) {
+                Toast.makeText(SongActivity.this, "Problems generate name", Toast.LENGTH_LONG).show();
+                Log.e(LOG_TAG, "Video name");
+            }
+        }
+        StorageReference filePath = storageReference.child("Video").child(name + ".mp4");
+        final Video newVideo = new Video(name, "00", videoUri.toString());
 
         filePath.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 progressDialog.dismiss();
-
-                // save record in user database
-                //manager.saveVideo(userId, videoUri.toString());
+                manager.AddVideo(userId, newVideo);
             }
         });
     }
@@ -285,18 +307,21 @@ public class SongActivity extends AppCompatActivity{
 
 
 
-
     // Recording Session
-    public void setRecordingAction(){
+    public void setRecordingAction() {
         activateRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!isRecording){
-                    isRecording=true;
-                    startRecording();
-                }else{
-                    isRecording=false;
-                    stopRecording();
+                if (permissionRecordAudioAccepted) {
+                    if (!isRecording) {
+                        isRecording = true;
+                        startRecording();
+                    } else {
+                        isRecording = false;
+                        stopRecording();
+                    }
+                } else {
+                    Toast.makeText(SongActivity.this, "Permission denied", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -317,7 +342,7 @@ public class SongActivity extends AppCompatActivity{
         simpleChronometer.setVisibility(View.VISIBLE);
         recordingLabel.setVisibility(View.VISIBLE);
 
-        Animation animation = AnimationUtils.loadAnimation(SongActivity.this,R.anim.blink);
+        Animation animation = AnimationUtils.loadAnimation(SongActivity.this, R.anim.blink);
         activateRecord.startAnimation(animation);
 
         simpleChronometer.setBase(SystemClock.elapsedRealtime());
@@ -334,39 +359,38 @@ public class SongActivity extends AppCompatActivity{
 
         activateRecord.clearAnimation();
 
-        rec_time=simpleChronometer.getText().toString();
+        rec_time = simpleChronometer.getText().toString();
         simpleChronometer.stop();
 
         showAlertAndSaveAudio();
     }
 
-    private void uploadAudio(String name){
+    private void uploadAudio(String name) {
         progressDialog.setMessage("Uploading Audio..");
         progressDialog.show();
 
-        if(name==""){
+        if (name == "") {
             try {
                 name = createTransactionID();
-            }catch (Exception e){
+            } catch (Exception e) {
                 Toast.makeText(SongActivity.this, "Problems generate name", Toast.LENGTH_LONG).show();
-                Log.e(LOG_TAG, "Media name");
+                Log.e(LOG_TAG, "Audio name");
             }
         }
-        StorageReference filePath = storageReference.child("Audio").child(name+".3gp");
+        StorageReference filePath = storageReference.child("Audio").child(name + ".3gp");
         final Uri uri = Uri.fromFile(new File(fileNameAudio));
-        final Audio newAudio = new Audio(name,rec_time,uri.toString());
+        final Audio newAudio = new Audio(name, rec_time, uri.toString());
 
         filePath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 progressDialog.dismiss();
-
-                manager.AddAudio(userId,newAudio);
+                manager.AddAudio(userId, newAudio);
             }
         });
     }
 
-    private void showAlertAndSaveAudio(){
+    private void showAlertAndSaveAudio() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter recording name & Save Audio");
 
@@ -380,10 +404,10 @@ public class SongActivity extends AppCompatActivity{
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(input.getText().toString().equals("")){
+                if (input.getText().toString().equals("")) {
                     // generate name
                     uploadAudio("");
-                }else {
+                } else {
                     String name = input.getText().toString();
                     uploadAudio(name);
                 }

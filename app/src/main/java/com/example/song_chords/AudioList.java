@@ -36,13 +36,11 @@ public class AudioList extends ArrayAdapter<Audio> {
         final ImageButton play = (ImageButton) listViewItem.findViewById(R.id.btn_play);
         TextView textViewRecordingName = (TextView) listViewItem.findViewById(R.id.text_record_name);
         final TextView textViewDuration = (TextView) listViewItem.findViewById(R.id.text_duration);
-        TextView textViewRef = (TextView) listViewItem.findViewById(R.id.text_ref_audio);
 
         Audio myAudio = audio.get(position);
 
         textViewRecordingName.setText(myAudio.getName());
         textViewDuration.setText(myAudio.getDuration());
-        textViewRef.setText(myAudio.getRef());
 
         return listViewItem;
     }

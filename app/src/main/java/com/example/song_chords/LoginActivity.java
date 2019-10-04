@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -46,6 +48,24 @@ public class LoginActivity extends AppCompatActivity {
         setForgotPasswordAction();
 
         setRegisterAction();
+
+        // Automatic fill for exist user
+        textEmail.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                if(manager.emailExist(textEmail.getText().toString())){
+                    password.setText(manager.getPassword(textEmail.getText().toString()));
+                }
+            }
+        });
 
     }
     public void setLogInAction(){

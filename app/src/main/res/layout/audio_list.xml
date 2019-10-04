@@ -20,7 +20,7 @@
         android:text="Record_name"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="12dp"
+        android:paddingTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#555555"
@@ -35,26 +35,13 @@
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="5dp"
+        android:paddingTop="10dp"
         android:layout_toRightOf="@id/btn_play"
         android:layout_below="@+id/text_record_name"
         android:textColor="#999999"
         android:textSize="14sp"
         android:textStyle="italic"/>
 
-    <TextView
-        android:id="@+id/text_ref_audio"
-        android:text="ref"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="2dp"
-        android:layout_toRightOf="@+id/btn_play"
-        android:layout_below="@+id/text_duration"
-        android:textColor="#999999"
-        android:textSize="14sp"
-        android:textStyle="italic"/>
 
 
 </RelativeLayout>
