@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,6 +32,10 @@ public class FirebaseManager {
         setUsersRef();
         setSongsRef();
     }
+    public FirebaseManager refresh(){
+       return new FirebaseManager();
+    }
+
     public void updateUserAudio(String id, Audio newAudio) {
         User user = getUserByKey(id);
         // remove old user
@@ -63,13 +69,18 @@ public class FirebaseManager {
     }
 
     public void AddAudio(final String id, Audio newAudio) {
+        // Update local
         updateUserAudio(id, newAudio);
 
         User user = getUserByKey(id);
         final ArrayList<Audio> updated = user.getAudioList();
 
+        for (int i = 0; i < updated.size(); i++) {
+            usersRef.getRef().child(id).child("AudioList").child(i + "").setValue(updated.get(i));
+        }
 
-        // Update in firebase
+        /*
+        // Update in fireBase
         usersRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -77,22 +88,26 @@ public class FirebaseManager {
                     dataSnapshot.getRef().child("AudioList").child(i + "").setValue(updated.get(i));
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("User", databaseError.getMessage());
             }
-        });
+        });*/
     }
 
     public void AddVideo(final String id, Video newVideo) {
+        // Update local
         updateUserVideo(id, newVideo);
 
         User user = getUserByKey(id);
         final ArrayList<Video> updated = user.getVideoList();
 
+        for (int i = 0; i < updated.size(); i++) {
+            usersRef.child(id).child("VideoList").child(i + "").setValue(updated.get(i));
+        }
 
-        // Update in firebase
+        /*
+        // Update in fireBase
         usersRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -105,7 +120,7 @@ public class FirebaseManager {
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("User", databaseError.getMessage());
             }
-        });
+        });*/
     }
 
     public int saveUser(User user) {
@@ -118,6 +133,27 @@ public class FirebaseManager {
         return 0; // user exist
     }
 
+    public User getUserByEmail(String email){
+        User user=null;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getEmail().equals(email))
+                return users.get(i);
+        }
+        return user;
+    }
+
+    public void updateUserRememberMe(String email,boolean r) {
+        if (emailExist(email)) {
+            User user = getUserByEmail(email);
+            usersRef.child(user.getId()).child("rememberMe").setValue(r);
+
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).getEmail().equals(email))
+                    users.get(i).setRememberMe(r);
+            }
+        }
+    }
+
     public void saveSong(Song song) {
         String id = songsRef.push().getKey();
         songsRef.child(id).setValue(song);
@@ -127,6 +163,15 @@ public class FirebaseManager {
         for (int i = 0; i < users.size(); i++) {
             if (users.get(i).getEmail().equals(email))
                 return true;
+        }
+        return false;
+    }
+
+    public boolean rememberMe(String email) {
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getEmail().equals(email) && users.get(i).getRememberMe()==true) {
+                return true;
+            }
         }
         return false;
     }
@@ -279,4 +324,11 @@ public class FirebaseManager {
         return current;
     }
 
+    public void setSongs(ArrayList<Song> songs) {
+        this.songs = songs;
+    }
+
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+    }
 }

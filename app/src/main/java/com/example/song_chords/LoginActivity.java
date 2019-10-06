@@ -10,6 +10,8 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,11 +21,14 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
+
     public TextView register;
     public TextView textEmail;
     public TextView password;
     public TextView forgotPassword;
     public Button logIn;
+    public CheckBox rememberMe_CheckBox;
+    public boolean rememberUser = false;
 
     public FirebaseManager manager;
 
@@ -32,42 +37,45 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+
         // initialize
         manager = new FirebaseManager();
 
         register = (TextView)findViewById(R.id.text_view_register);
         textEmail = (TextView)findViewById(R.id.text_email);
         password = (TextView)findViewById(R.id.edit_text_password);
+        rememberMe_CheckBox = (CheckBox)findViewById(R.id.rememberMe);
         forgotPassword = (TextView)findViewById(R.id.text_view_forget_password);
 
         logIn = (Button)findViewById(R.id.button_sign_in);
         //addSongs();
 
         setLogInAction();
-
         setForgotPasswordAction();
-
         setRegisterAction();
 
+        setCheckBoxAction();
         // Automatic fill for exist user
+        setAutomatiFill();
+
+    }
+
+    public void setAutomatiFill() {
         textEmail.addTextChangedListener(new TextWatcher() {
-
-            public void afterTextChanged(Editable s) {
-            }
-
+            public void afterTextChanged(Editable s) { }
             public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {
-            }
-
+                                          int count, int after) { }
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
-                if(manager.emailExist(textEmail.getText().toString())){
-                    password.setText(manager.getPassword(textEmail.getText().toString()));
+                if(manager.emailExist(textEmail.getText().toString()) &&
+                        manager.rememberMe(textEmail.getText().toString())){
+                    String p = manager.getPassword(textEmail.getText().toString());
+                    password.setText(p);
                 }
             }
         });
-
     }
+
     public void setLogInAction(){
         logIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,6 +133,21 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
                 startActivity(intent);
                 finish();
+            }
+        });
+    }
+
+    public void setCheckBoxAction(){
+        rememberMe_CheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    rememberUser = true;
+                    manager.updateUserRememberMe(textEmail.getText().toString(),true);
+                }else {
+                    rememberUser = false;
+                    manager.updateUserRememberMe(textEmail.getText().toString(),false);
+                }
             }
         });
     }

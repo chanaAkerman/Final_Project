@@ -8,6 +8,7 @@ public class User {
     public String id;
     public String email;
     public String password;
+    public boolean rememberMe;
     public ArrayList<Audio> audioList;
     public ArrayList<Video> videoList;
 
@@ -16,6 +17,15 @@ public class User {
     public User(String email,String password){
         this.email=email;
         this.password =password;
+        rememberMe=false;
+        this.audioList =new ArrayList<>();
+        this.videoList =new ArrayList<>();
+    }
+
+    public User(String email,String password,boolean rememberMe){
+        this.email=email;
+        this.password =password;
+        this.rememberMe=rememberMe;
         this.audioList =new ArrayList<>();
         this.videoList =new ArrayList<>();
     }
@@ -42,6 +52,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean getRememberMe() {
+        return this.rememberMe;
+    }
+
+    public void setRememberMe(boolean rememberMe) {
+        this.rememberMe = rememberMe;
     }
 
     public ArrayList<Audio> getAudioList() {

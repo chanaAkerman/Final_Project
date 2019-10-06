@@ -90,4 +90,12 @@ public class SearchSongActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(SearchSongActivity.this, MenuActivity.class);
+        intent.putExtra(EXTRA_USER_ID, userId);
+        startActivity(intent);
+        finish();
+    }
 }

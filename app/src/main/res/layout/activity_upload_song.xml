@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E3D7F5"
+    tools:context=".UploadSongActivity">
+
+    <TextView
+        android:id="@+id/upload_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_horizontal"
+        android:text="Upload Song"
+        android:textColor="#090808"
+        android:textSize="30sp"
+        android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/text_song_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_song"
+            android:drawablePadding="10dp"
+            android:singleLine="true"
+            android:layout_marginBottom="10dp"
+            android:hint="song name"
+            android:inputType="text"
+            android:layout_below="@id/upload_title"/>
+
+        <EditText
+            android:id="@+id/text_singer_name"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_note"
+            android:drawablePadding="10dp"
+            android:singleLine="true"
+            android:layout_marginBottom="10dp"
+            android:hint="singer name"
+            android:inputType="text"
+            android:layout_below="@id/text_song_name"/>
+
+        <TextView
+            android:id="@+id/label"
+            android:layout_below="@+id/text_singer_name"
+            android:text="Enter your song lyrics here"
+            android:layout_marginLeft="10dp"
+            android:paddingBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/songInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="20"
+            android:maxLines="100"
+            android:gravity="top|left"
+            android:inputType="textMultiLine"
+            android:background="@drawable/ic_edittext"
+            android:text="And i will always love you"
+            android:layout_below="@id/label"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"/>
+
+        <Button
+            android:id="@+id/button_upload"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="22dp"
+            android:background="#d67601"
+            android:text="Upload"
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:textSize="18sp"
+            android:layout_below="@+id/songInput"/>
+
+</RelativeLayout>

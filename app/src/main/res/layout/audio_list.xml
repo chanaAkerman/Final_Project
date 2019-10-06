@@ -1,47 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/colorPink"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPink">
+    android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/btn_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#E3D7F5"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="20dp"
-        android:background="@drawable/ic_play"
-        app:srcCompat="@drawable/ic_play" />
+    <ImageView
+        android:id="@+id/play"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/ic_play"/>
 
     <TextView
         android:id="@+id/text_record_name"
-        android:text="Record_name"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="15dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/play"
+        android:text="AudioName"
         android:textColor="#555555"
         android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_toRightOf="@+id/btn_play"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/text_duration"
-        android:text="time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        android:layout_toRightOf="@id/btn_play"
         android:layout_below="@+id/text_record_name"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/play"
+        android:text="time"
         android:textColor="#999999"
         android:textSize="14sp"
         android:textStyle="italic"/>
-
-
 
 </RelativeLayout>

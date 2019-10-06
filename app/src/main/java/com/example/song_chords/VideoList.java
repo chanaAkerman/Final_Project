@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -25,7 +26,7 @@ public class VideoList extends ArrayAdapter<Video> {
         LayoutInflater inflater=context.getLayoutInflater();
         View listViewItem=inflater.inflate(R.layout.video_list,null,true);
 
-        VideoView videoView=(VideoView) listViewItem.findViewById(R.id.video_view);
+        ImageView videoView=(ImageView) listViewItem.findViewById(R.id.video_view);
         TextView textViewVideoName=(TextView)listViewItem.findViewById(R.id.textViewVideoName);
         TextView textViewDuration=(TextView)listViewItem.findViewById(R.id.textViewDuration);
 

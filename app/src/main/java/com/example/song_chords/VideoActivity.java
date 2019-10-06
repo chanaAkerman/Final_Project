@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.media.MediaCodecList;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ListView;
 import android.widget.MediaController;
@@ -24,8 +25,11 @@ public class VideoActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         uri=intent.getStringExtra(UserVideo.EXTRA_VIDEO_URI);
+        Uri muri=Uri.parse(uri);
 
         videoView = (VideoView) findViewById(R.id.video);
+        videoView.setVideoURI(muri);
+        videoView.start();
 
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -35,6 +39,5 @@ public class VideoActivity extends AppCompatActivity {
                 mediaController.setAnchorView(videoView);
             }
         });
-        videoView.start();
     }
 }

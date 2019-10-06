@@ -13,6 +13,7 @@ import android.os.Bundle;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,12 +89,6 @@ public class SongActivity extends AppCompatActivity {
     public String rec_time;
 
 
-    // Requesting permission to RECORD_AUDIO
-    private boolean permissionRecordVideoAccepted = true;
-    private boolean permissionRecordAudioAccepted = true;
-    private static final int PERMISSION_REQUEST_CODE = 200;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,16 +109,6 @@ public class SongActivity extends AppCompatActivity {
         final String txtFileUrl = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_LINK);
         String name = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_NAME);
         userId = intent.getStringExtra(SearchSongActivity.EXTRA_USER_ID);
-
-
-        //Permissions
-        ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE},
-                PERMISSION_REQUEST_CODE);
-        checkPermission();
 
         simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer); // initiate a chronometer
 
@@ -179,16 +164,13 @@ public class SongActivity extends AppCompatActivity {
         return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
 
-    public void checkPermission() {
-        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED)) {
-            permissionRecordVideoAccepted = false;
-        }
-
-        if (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                == PackageManager.PERMISSION_GRANTED)) {
-            permissionRecordAudioAccepted = false;
-        }
+    @Override
+    public void onBackPressed() {
+        // your code.
+        Intent intent = new Intent(SongActivity.this, SearchSongActivity.class);
+        intent.putExtra(EXTRA_USER_ID, userId);
+        startActivity(intent);
+        finish();
     }
 
 
@@ -208,16 +190,11 @@ public class SongActivity extends AppCompatActivity {
         activateCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (permissionRecordVideoAccepted) {
-                    if (hasCamera())
-                        RecordingVideo();
-                    else {
-                        Toast.makeText(SongActivity.this, "Device does not support Camera", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(SongActivity.this, "Permission denied", Toast.LENGTH_LONG).show();
+                if (hasCamera())
+                    RecordingVideo();
+                else {
+                    Toast.makeText(SongActivity.this, "Device does not support Camera", Toast.LENGTH_LONG).show();
                 }
-
             }
         });
     }
@@ -292,14 +269,25 @@ public class SongActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Video name");
             }
         }
-        StorageReference filePath = storageReference.child("Video").child(name + ".mp4");
-        final Video newVideo = new Video(name, "00", videoUri.toString());
+        final String vName = name;
+        final StorageReference filePath = storageReference.child("Video").child(name + ".mp4");
 
         filePath.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 progressDialog.dismiss();
-                manager.AddVideo(userId, newVideo);
+
+                filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Uri downloadUrl = uri;
+
+                        Video newVideo = new Video(vName, "00", uri.toString());
+                        manager.AddVideo(userId, newVideo);
+
+                        //Do what you want with the url
+                    }
+                });
             }
         });
     }
@@ -308,20 +296,17 @@ public class SongActivity extends AppCompatActivity {
 
 
     // Recording Session
+
     public void setRecordingAction() {
         activateRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (permissionRecordAudioAccepted) {
-                    if (!isRecording) {
-                        isRecording = true;
-                        startRecording();
-                    } else {
-                        isRecording = false;
-                        stopRecording();
-                    }
+                if (!isRecording) {
+                    isRecording = true;
+                    startRecording();
                 } else {
-                    Toast.makeText(SongActivity.this, "Permission denied", Toast.LENGTH_LONG).show();
+                    isRecording = false;
+                    stopRecording();
                 }
             }
         });
@@ -377,15 +362,27 @@ public class SongActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Audio name");
             }
         }
-        StorageReference filePath = storageReference.child("Audio").child(name + ".3gp");
-        final Uri uri = Uri.fromFile(new File(fileNameAudio));
-        final Audio newAudio = new Audio(name, rec_time, uri.toString());
+        final String rName = name;
+        final StorageReference filePath = storageReference.child("Audio").child(name + ".3gp");
+        Uri uri = Uri.fromFile(new File(fileNameAudio));
+
 
         filePath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 progressDialog.dismiss();
-                manager.AddAudio(userId, newAudio);
+
+                filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Uri downloadUrl = uri;
+
+                        Audio newAudio = new Audio(rName, rec_time, uri.toString());
+                        manager.AddAudio(userId, newAudio);
+
+                        //Do what you want with the url
+                    }
+                });
             }
         });
     }
