@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -47,22 +49,46 @@ public class SearchSongActivity extends AppCompatActivity {
         // on click listener handler
         setSearchSongListAction();
 
+        setAutomatiFill();
+
     }
+    public void setAutomatiFill() {
+        searchField.addTextChangedListener(new TextWatcher() {
+            public void afterTextChanged(Editable s) { }
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) { }
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                String songToSearch = searchField.getText()+"";
+                songs = manager.getSongByName(userId,songToSearch);
+                if(songs!=null){
+                    //creating adapter
+                    SongsList songAdapter;
+                    songAdapter = new SongsList(SearchSongActivity.this,songs);
+                    searchSongList.setAdapter(songAdapter);
+                }
+
+            }
+        });
+    }
+
     public void setSearchAction(){
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String songToSearch = searchField.getText()+"";
-                songs = manager.getSongByName(songToSearch);
+                songs = manager.getSongByName(userId,songToSearch);
 
                 if(songs==null) {
                     Toast.makeText(SearchSongActivity.this, "Song Not Found", Toast.LENGTH_LONG).show();
                     searchSongList.setAdapter(null);
                 }else{
+                    /*
                     //creating adapter
                     SongsList songAdapter;
                     songAdapter = new SongsList(SearchSongActivity.this,songs);
                     searchSongList.setAdapter(songAdapter);
+                    */
                 }
             }
         });

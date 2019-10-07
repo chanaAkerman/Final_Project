@@ -56,15 +56,51 @@
             android:id="@+id/songInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="20"
+            android:lines="15"
             android:maxLines="100"
             android:gravity="top|left"
             android:inputType="textMultiLine"
             android:background="@drawable/ic_edittext"
-            android:text="And i will always love you"
             android:layout_below="@id/label"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"/>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/bok_public"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Public"
+        android:checked="true"
+        android:layout_gravity="left"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/songInput"/>
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/bok_private"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:text="Private"
+        android:layout_gravity="left"
+        android:layout_below="@+id/bok_public"/>
+
+    <ImageView
+        android:id="@+id/singer_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/songInput"
+        android:layout_marginLeft="125dp"
+        android:layout_toLeftOf="@+id/btn_add_picture"
+        android:layout_toRightOf="@+id/bok_private" />
+
+    <Button
+        android:id="@+id/btn_add_picture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/songInput"
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:text="add picture" />
 
         <Button
             android:id="@+id/button_upload"
@@ -76,6 +112,6 @@
             android:textAllCaps="false"
             android:textColor="#fff"
             android:textSize="18sp"
-            android:layout_below="@+id/songInput"/>
+            android:layout_below="@+id/bok_private"/>
 
 </RelativeLayout>

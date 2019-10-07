@@ -11,6 +11,7 @@ public class User {
     public boolean rememberMe;
     public ArrayList<Audio> audioList;
     public ArrayList<Video> videoList;
+    public ArrayList<Song> songsList;
 
     public User(){ }
 
@@ -20,6 +21,7 @@ public class User {
         rememberMe=false;
         this.audioList =new ArrayList<>();
         this.videoList =new ArrayList<>();
+        this.songsList =new ArrayList<>();
     }
 
     public User(String email,String password,boolean rememberMe){
@@ -70,12 +72,20 @@ public class User {
         return videoList;
     }
 
+    public ArrayList<Song> getSongsList() {
+        return songsList;
+    }
+
     public void setVideoList(ArrayList<Video> videoList) {
         this.videoList = videoList;
     }
 
     public void setAudioList(ArrayList<Audio> audioList) {
         this.audioList=audioList;
+    }
+
+    public void setSongsList(ArrayList<Song> songsList) {
+        this.songsList = songsList;
     }
 
     public void clearAudioList(){
@@ -86,12 +96,17 @@ public class User {
         this.videoList.clear();
     }
 
+    public void clearSongsList(){
+        this.songsList.clear();
+    }
+
     @Override
     public String toString() {
-        int vSize=0,aSize=0;
+        int vSize=0,aSize=0,sSize=0;
         if(videoList!=null){ vSize=videoList.size();}
         if(audioList!=null){ aSize=audioList.size();}
-        return "[ "+id+", "+email+", "+password+" audioSize: "+aSize +" videoSize: "+vSize +"]";
+        if(songsList!=null){ sSize=songsList.size();}
+        return "[ "+id+", "+email+", "+password+" audioSize: "+aSize +" videoSize: "+vSize +" songSize: "+sSize+"]";
     }
 
     @Override
