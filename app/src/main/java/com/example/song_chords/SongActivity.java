@@ -3,9 +3,11 @@ package com.example.song_chords;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,6 +35,7 @@ import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -84,6 +87,8 @@ public class SongActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     public boolean isRecording = false;
+    public boolean isCameraRecording = false;
+    public boolean isCameraOn=false;
 
     Chronometer simpleChronometer;
     public String rec_time;
@@ -95,6 +100,7 @@ public class SongActivity extends AppCompatActivity {
         setContentView(R.layout.activity_song);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -176,7 +182,6 @@ public class SongActivity extends AppCompatActivity {
 
 
     // Camera Session
-
     private boolean hasCamera() {
         if (getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_CAMERA_FRONT)) {
@@ -190,9 +195,9 @@ public class SongActivity extends AppCompatActivity {
         activateCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (hasCamera())
+                if (hasCamera()) {
                     RecordingVideo();
-                else {
+                }else {
                     Toast.makeText(SongActivity.this, "Device does not support Camera", Toast.LENGTH_LONG).show();
                 }
             }
