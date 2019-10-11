@@ -1,5 +1,6 @@
 package com.example.song_chords;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -12,12 +13,18 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import org.w3c.dom.Text;
 
@@ -27,12 +34,13 @@ public class MenuActivity extends AppCompatActivity {
     
     public String userId;
 
-    public Button search;
-    public Button upload;
-    public Button userAudio;
-    public Button userVideo;
+    public ImageButton search;
+    public ImageButton upload;
+    public ImageButton userAudio;
+    public ImageButton userVideo;
 
     private boolean permissionAccepted = true;
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +57,11 @@ public class MenuActivity extends AppCompatActivity {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.READ_EXTERNAL_STORAGE},
                 PERMISSION_REQUEST_CODE);
-        checkPermission();
 
-        search=(Button)findViewById(R.id.btn_search);
-        upload=(Button)findViewById(R.id.btn_upload);
-        userAudio=(Button)findViewById(R.id.btn_audio);
-        userVideo=(Button)findViewById(R.id.btn_video);
+        search=(ImageButton)findViewById(R.id.btn_search);
+        upload=(ImageButton)findViewById(R.id.btn_upload);
+        userAudio=(ImageButton)findViewById(R.id.btn_audio);
+        userVideo=(ImageButton)findViewById(R.id.btn_video);
 
         setOnSearchButton();
         setOnUploadButton();
@@ -62,31 +69,20 @@ public class MenuActivity extends AppCompatActivity {
         setOnUserVideoButton();
     }
 
-    public void checkPermission() {
-        if ((!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) ||
-                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) ||
-                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))||
-                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) )
-            {
-                permissionAccepted= false;
-            }else {
-            permissionAccepted = true;
-        }
-
-    }
-
     private void setOnUserVideoButton() {
             userVideo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (permissionAccepted) {
-                        Intent intent = new Intent(MenuActivity.this, UserVideo.class);
-                        intent.putExtra(EXTRA_USER_ID, userId);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Toast.makeText(MenuActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
-                    }
+                    Animation animation = AnimationUtils.loadAnimation(MenuActivity.this, R.anim.blink);
+                    userVideo.startAnimation(animation);
+
+                    Intent intent = new Intent(MenuActivity.this, UserVideo.class);
+                    intent.putExtra(EXTRA_USER_ID, userId);
+                    startActivity(intent);
+                    finish();
+
+                    overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+
                 }
             });
     }
@@ -95,14 +91,16 @@ public class MenuActivity extends AppCompatActivity {
         userAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (permissionAccepted) {
-                    Intent intent = new Intent(MenuActivity.this, UserAudio.class);
-                    intent.putExtra(EXTRA_USER_ID, userId);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(MenuActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
-                }
+                Animation animation = AnimationUtils.loadAnimation(MenuActivity.this, R.anim.blink);
+                userAudio.startAnimation(animation);
+
+                Intent intent = new Intent(MenuActivity.this, UserAudio.class);
+                intent.putExtra(EXTRA_USER_ID, userId);
+                startActivity(intent);
+                finish();
+
+                overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+
             }
         });
     }
@@ -111,14 +109,16 @@ public class MenuActivity extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (permissionAccepted) {
-                    Intent intent = new Intent(MenuActivity.this, UploadSongActivity.class);
-                    intent.putExtra(EXTRA_USER_ID, userId);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(MenuActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
-                }
+                Animation animation = AnimationUtils.loadAnimation(MenuActivity.this, R.anim.blink);
+                upload.startAnimation(animation);
+
+                Intent intent = new Intent(MenuActivity.this, UploadSongActivity.class);
+                intent.putExtra(EXTRA_USER_ID, userId);
+                startActivity(intent);
+                finish();
+
+                overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+
             }
         });
     }
@@ -127,14 +127,15 @@ public class MenuActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (permissionAccepted) {
-                    Intent intent = new Intent(MenuActivity.this, SearchSongActivity.class);
-                    intent.putExtra(EXTRA_USER_ID, userId);
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(MenuActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
-                }
+                Animation animation = AnimationUtils.loadAnimation(MenuActivity.this, R.anim.blink);
+                search.startAnimation(animation);
+
+                Intent intent = new Intent(MenuActivity.this, SearchSongActivity.class);
+                intent.putExtra(EXTRA_USER_ID, userId);
+                startActivity(intent);
+                finish();
+
+                overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
             }
         });
     }
@@ -148,7 +149,14 @@ public class MenuActivity extends AppCompatActivity {
                 .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // The user wants to leave - so dismiss the dialog and exit
-                        finish();
+
+                        googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                //On Succesfull signout we navigate the user back to LoginActivity
+                                finish();
+                            }
+                        });
                         dialog.dismiss();
                     }
                 }).setNegativeButton("NO", new DialogInterface.OnClickListener() {

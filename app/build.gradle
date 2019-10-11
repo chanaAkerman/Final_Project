@@ -46,4 +46,5 @@ dependencies {
     compile files('libs/additional.jar')
     compile files('libs/mail.jar')
     implementation 'com.google.android.gms:play-services:7.5.0'
+    implementation 'com.itextpdf:itextg:5.5.10'
 }

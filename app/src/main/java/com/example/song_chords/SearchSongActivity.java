@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -17,7 +19,6 @@ import java.util.ArrayList;
 
 public class SearchSongActivity extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
-
     public static final String EXTRA_SONG_LINK = "com.example.application.song_chords.EXTRA_SONG_LINK";
     public static final String EXTRA_SONG_NAME = "com.example.application.song_chords.EXTRA_SONG_NAME";
 
@@ -76,6 +77,9 @@ public class SearchSongActivity extends AppCompatActivity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Animation animation = AnimationUtils.loadAnimation(SearchSongActivity.this, R.anim.blink);
+                search.startAnimation(animation);
+
                 String songToSearch = searchField.getText()+"";
                 songs = manager.getSongByName(userId,songToSearch);
 
@@ -113,6 +117,7 @@ public class SearchSongActivity extends AppCompatActivity {
                 startActivity(intent);
 
                 finish();
+                overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
             }
         });
     }

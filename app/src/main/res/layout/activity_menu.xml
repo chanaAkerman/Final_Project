@@ -5,13 +5,14 @@
     android:background="#E3D7F5"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     tools:context=".MenuActivity">
 
+
     <TextView
-        android:id="@+id/welcome"
-        android:text="Welcome back!!"
-        android:textColor="#D60CFA"
+        android:id="@+id/textViewName"
+        android:text="Choose an option: "
+        android:textColor="#090808"
         android:textSize="30sp"
         android:textStyle="bold"
         android:layout_width="fill_parent"
@@ -20,60 +21,65 @@
         android:paddingTop="20dp"/>
 
     <RelativeLayout
+        android:layout_below="@id/textViewName"
         android:id="@+id/r1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/welcome"
-        android:paddingTop="100dp">
+        android:layout_height="wrap_content">
 
-        <Button
+        <ImageButton
+            android:src="@drawable/pic2"
+            android:background="#E3D7F5"
             android:id="@+id/btn_search"
-            android:text="search song"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="210dp"
+            android:layout_height="390dp"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/round_button" />
+            android:layout_centerInParent="true" />
 
-        <Button
+        <ImageButton
+
             android:id="@+id/btn_upload"
-            android:text="upload song"
-            android:textSize="25sp"
-            android:textStyle="bold"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="210dp"
+            android:layout_height="390dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="30dp"
-            android:background="@drawable/round_button"/>
+            android:layout_centerHorizontal="true"
+
+
+            android:layout_marginLeft="2dp"
+            android:background="#E3D7F5"
+            android:src="@drawable/pic1" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/r2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/r1"
-        android:paddingTop="30dp">
-        <Button
+        >
+
+        <ImageButton
+            android:background="#E3D7F5"
+            android:src="@drawable/pic4"
             android:id="@+id/btn_audio"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:text="my records"
-            android:textSize="25sp"
-            android:textStyle="bold"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/round_button"/>
-        <Button
+            android:layout_width="210dp"
+            android:layout_height="390dp"
+            />
+
+        <ImageButton
+            android:background="#E3D7F5"
+            android:src="@drawable/pic3"
+
             android:id="@+id/btn_video"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:text=" my    videos"
-            android:textSize="25sp"
-            android:textStyle="bold"
+            android:layout_width="210dp"
+            android:layout_height="390dp"
             android:layout_alignParentLeft="true"
-            android:layout_marginLeft="30dp"
-            android:background="@drawable/round_button"/>
+            />
+
     </RelativeLayout>
+
+
+
+
+
+
 </RelativeLayout>

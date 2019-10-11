@@ -2,16 +2,20 @@ package com.example.song_chords;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
+import android.icu.text.UnicodeSetSpanner;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,9 +34,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 
 import java.io.ByteArrayInputStream;
@@ -74,6 +80,8 @@ public class UploadSongActivity extends AppCompatActivity {
 
     File file = null;
 
+    public boolean permissionAccepted = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,38 +105,59 @@ public class UploadSongActivity extends AppCompatActivity {
         public_CheckBox = (CheckBox)findViewById(R.id.bok_public);
         private_CheckBox = (CheckBox)findViewById(R.id.bok_private);
 
+        checkPermission();
+
         setOnUploadButton();
         setOnUploadPictureButton();
         setPublicCheckBoxAction();
         setPrivateCheckBoxAction();
 
     }
+    public void checkPermission() {
+        if ((!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) ||
+                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) ||
+                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))||
+                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) )
+        {
+            permissionAccepted= false;
+        }else {
+            permissionAccepted = true;
+        }
+    }
 
     public void setOnUploadButton() {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                songName = song_name.getText() + "";
-                singerName = singer_name.getText() + "";
-                sondLyrics = song_lyrics.getText() + "";
+                if(permissionAccepted) {
+                    songName = song_name.getText() + "";
+                    singerName = singer_name.getText() + "";
+                    sondLyrics = song_lyrics.getText() + "";
 
-                if (songName == "") {
-                    Toast.makeText(UploadSongActivity.this, "Please enter song name!", Toast.LENGTH_LONG).show();
-                } else if (singerName == "") {
-                    Toast.makeText(UploadSongActivity.this, "Please enter singer name!", Toast.LENGTH_LONG).show();
-                } else {
-                    // Create pdf file for the new song
-                    createPDF();
+                    if (songName == "") {
+                        Toast.makeText(UploadSongActivity.this, "Please enter song name!", Toast.LENGTH_LONG).show();
+                    } else if (singerName == "") {
+                        Toast.makeText(UploadSongActivity.this, "Please enter singer name!", Toast.LENGTH_LONG).show();
+                    } else {
+                        // Create pdf file for the new song
+                        //createPDF();
+                        savePDF();
 
-                    // Upload the song to fireBase
-                    // Public - to the public song list
-                    // Private - to the private song list
-                    if(pub){ uploadSong();}
-                    else{ uploadSongPrivate();}
+                        // Upload the song to fireBase
+                        // Public - to the public song list
+                        // Private - to the private song list
+                        if (pub) {
+                            uploadSongPublic();
+                        } else {
+                            uploadSongPrivate();
+                        }
 
-                    // Exit Activity after uploading - possible to stay and upload more.
-                    exitDialog();
+                        // Exit Activity after uploading - possible to stay and upload more.
+                        exitDialog();
 
+                    }
+                }else{
+                    Toast.makeText(UploadSongActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -138,7 +167,11 @@ public class UploadSongActivity extends AppCompatActivity {
         upload_picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
+                if(permissionAccepted)
+                    startActivityForResult(new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI), GET_FROM_GALLERY);
+                else{
+                    Toast.makeText(UploadSongActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -187,6 +220,25 @@ public class UploadSongActivity extends AppCompatActivity {
         }
     }
 
+
+    public void savePDF(){
+        Document document = new Document();
+        String myFilePath = getExternalCacheDir().getAbsolutePath() + "/mySongPDF.pdf";
+
+        try{
+            String lyrics = song_lyrics.getText().toString();
+
+            PdfWriter.getInstance(document,new FileOutputStream(myFilePath));
+            document.open();
+            document.add(new Paragraph(lyrics));
+            document.close();
+
+            file = new File(myFilePath);
+        }catch (Exception e){
+            Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void createPDF() {
 
         PdfDocument pdfDocument = new PdfDocument();
@@ -212,7 +264,7 @@ public class UploadSongActivity extends AppCompatActivity {
 
     }
 
-    public void uploadSong() {
+    public void uploadSongPublic() {
         progressDialog.setMessage("Uploading Song..");
         progressDialog.show();
 
@@ -382,7 +434,7 @@ public class UploadSongActivity extends AppCompatActivity {
                             Toast.makeText(UploadSongActivity.this, "Please enter singer name!", Toast.LENGTH_LONG).show();
                         }else {
                             createPDF();
-                            uploadSong();
+                            uploadSongPublic();
                         }
                     }
                 }).setNegativeButton("OK", new DialogInterface.OnClickListener() {

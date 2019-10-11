@@ -3,13 +3,20 @@ package com.example.song_chords;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.accounts.Account;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -30,7 +37,9 @@ import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
-    public int RC_SIGN_IN=0;
+    public static final String EXTRA_USER_GMAIL = "com.example.application.Song_Chords.EXTRA_USER_GMAIL";
+    private static final String TAG = "AndroidClarified";
+    public int RC_SIGN_IN=101;
 
     public TextView register;
     public TextView textEmail;
@@ -60,8 +69,12 @@ public class LoginActivity extends AppCompatActivity {
         rememberMe_CheckBox = (CheckBox)findViewById(R.id.rememberMe);
         forgotPassword = (TextView)findViewById(R.id.text_view_forget_password);
 
-        logIn = (Button)findViewById(R.id.button_sign_in);
-        signInButton = findViewById(R.id.sign_in_button);
+        logIn = (Button)findViewById(R.id.logIn);
+        signInButton = findViewById(R.id.signInGoogle);
+
+        Spannable WordtoSpan = new SpannableString("Don't have an account.\nRegister Here");
+        WordtoSpan.setSpan(new ForegroundColorSpan(Color.RED), 32, 36, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        register.setText(WordtoSpan);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -97,45 +110,62 @@ public class LoginActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
-            String userEmail = account.getEmail();
-            textEmail.setText(account.getEmail());
-            if(manager.emailExist(userEmail)){
-                // if user exist
+        if (resultCode == Activity.RESULT_OK)
+            switch (requestCode) {
+                case 101:
+                    try {
+                        // The Task returned from this call is always completed, no need to attach
+                        // a listener.
+                        Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        onLoggedIn(account);
+                    } catch (ApiException e) {
+                        // The ApiException status code indicates the detailed failure reason.
+                        Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+                    }
+                    break;
             }
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("ERROR", "signInResult:failed code=" + e.getStatusCode());
+    }
+
+    private void onLoggedIn(GoogleSignInAccount googleSignInAccount) {
+        // sign in successfully
+        String googleEmail = googleSignInAccount.getEmail();
+
+        if(manager.emailExist(googleEmail) && manager.rememberMe(googleEmail)){
+            User user = manager.getUserByEmail(googleEmail);
+            textEmail.setText(googleEmail);
+            password.setText(user.getPassword());
+            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+            intent.putExtra(EXTRA_USER_ID, user.getId());
+            startActivity(intent);
+            finish();
+            overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        }
+        else if(manager.emailExist(googleEmail)){
+            textEmail.setText(googleEmail);
+        }else{
+            // move to register
+            Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
+            intent.putExtra(EXTRA_USER_GMAIL, googleEmail);
+            startActivity(intent);
+            finish();
+            overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
         }
     }
+
+    /*
     @Override
     protected void onStart() {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account!=null){
-            String userEmail = account.getEmail();
-            textEmail.setText(account.getEmail());
-            if(manager.emailExist(userEmail)){
-                // if user exist
+            Toast.makeText(this, "Already Logged In", Toast.LENGTH_SHORT).show();
+            onLoggedIn(account);
 
             }else{
-
-            }
+            Log.d(TAG, "Not logged in");
         }super.onStart();
 
-    }
+    }*/
 
 
     public void setAutomatiFill() {
@@ -170,11 +200,15 @@ public class LoginActivity extends AppCompatActivity {
 
                 } else {
                     if (manager.userExist(user)) {
+                        Animation animation = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.blink);
+                        logIn.startAnimation(animation);
+
                         // User exist, start new activity
                         Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
                         intent.putExtra(EXTRA_USER_ID, manager.getUserKey(user));
                         startActivity(intent);
                         finish();
+                        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
                     } else if (manager.emailExist(user.getEmail())) {
                         // wrong password
                         Toast.makeText(LoginActivity.this, "Wrong Password", Toast.LENGTH_LONG).show();
@@ -208,9 +242,14 @@ public class LoginActivity extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Animation animation = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.rotate);
+                register.startAnimation(animation);
+
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
+                intent.putExtra(EXTRA_USER_GMAIL, "");
                 startActivity(intent);
                 finish();
+                overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
             }
         });
     }
@@ -273,7 +312,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void addSongs(){
-        Song s1 = new Song("אם יש גן עדן", "אייל גולן","","");
+        /*Song s1 = new Song("אם יש גן עדן", "אייל גולן","","");
         Song s3 = new Song("אהבה קטנה", "שירי מימון", "", "");
         Song s4 = new Song("את לי הכל", "הראל סקעת", "", "");
         Song s5 = new Song("אושר לדקה", "אורי בן ארי", "", "");
@@ -285,7 +324,20 @@ public class LoginActivity extends AppCompatActivity {
         Song s11 = new Song("מתנות קטנות", "רמי קלינשטיין", "", "");
         Song s12 = new Song("עד שתחזור", "יובל דיין", "", "");
         Song s13 = new Song("רצים באוויר", "גיא ויהל", "", "");
-        Song s14 = new Song("תוכו רצוף אהבה", "ישי ריבו", "", "");
+        Song s14 = new Song("תוכו רצוף אהבה", "ישי ריבו", "", "");*/
+
+
+        Song s1 = new Song("Tonight", "Jonas Brothers","","");
+        Song s3 = new Song("Hello Beautiful", "Jonas Brothers", "", "");
+        Song s4 = new Song("Australia", "Jonas Brothers", "", "");
+        Song s5 = new Song("Youngblood", "5 Second of Summer", "", "");
+        Song s6 = new Song("Amnesia", "5 Second of Summer", "", "");
+        Song s7 = new Song("She looks so perfect", "5 Second of Summer", "", "");
+        Song s8 = new Song("Perfect", "Ed Sheeran", "", "");
+        Song s9 = new Song("Everything has changed", "Taylor Swift", "", "");
+        Song s12 = new Song("The story of us", "Taylor Swift", "", "");
+        Song s10 = new Song("Firework", "Katy Perry", "", "");
+        Song s11 = new Song("One last time", "Ariana Grande", "", "");
 
         manager.saveSong(s1);
         manager.saveSong(s3);
@@ -298,8 +350,6 @@ public class LoginActivity extends AppCompatActivity {
         manager.saveSong(s10);
         manager.saveSong(s11);
         manager.saveSong(s12);
-        manager.saveSong(s13);
-        manager.saveSong(s14);
     }
 
 }

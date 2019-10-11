@@ -7,7 +7,9 @@ import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.hardware.Camera;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,18 +33,24 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.os.Environment;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +61,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class SongActivity extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
@@ -61,6 +71,8 @@ public class SongActivity extends AppCompatActivity {
     public static final String EXTRA_VIDEO_URI = "com.example.application.song_chords.EXTRA_VIDEO_URI";
 
     public static final String LOG_TAG = "ERROR";
+
+    public String songName;
 
     private final int RESPONSE_CODE = 200;
     static final int REQUEST_VIDEO_CAPTURE = 1;
@@ -77,6 +89,8 @@ public class SongActivity extends AppCompatActivity {
     public Uri audioUri;
     public FirebaseManager manager;
 
+    public ScrollView scrollView;
+
     private StorageReference storageReference;
 
     public File fileNameVideo = null;
@@ -87,11 +101,11 @@ public class SongActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     public boolean isRecording = false;
-    public boolean isCameraRecording = false;
-    public boolean isCameraOn=false;
 
     Chronometer simpleChronometer;
     public String rec_time;
+
+    public boolean permissionAccepted = true;
 
 
     @Override
@@ -110,11 +124,14 @@ public class SongActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
         // get variables from previous activity
         Intent intent = getIntent();
         final String txtFileUrl = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_LINK);
-        String name = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_NAME);
+        songName = intent.getStringExtra(SearchSongActivity.EXTRA_SONG_NAME);
         userId = intent.getStringExtra(SearchSongActivity.EXTRA_USER_ID);
+
+        checkPermission();
 
         simpleChronometer = (Chronometer) findViewById(R.id.simpleChronometer); // initiate a chronometer
 
@@ -134,14 +151,39 @@ public class SongActivity extends AppCompatActivity {
         }
 
         pdfView = (PDFView) findViewById(R.id.pdfView);
+        scrollView = (ScrollView)findViewById(R.id.scrollView) ;
         recordingLabel = (TextView) findViewById(R.id.recording_label);
         activateCamera = (Button) findViewById(R.id.btn_camera);
         activateRecord = (Button) findViewById(R.id.btn_record);
+
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        toolbarLayout.setTitle(songName);
 
         setCameraAction();
         setRecordingAction();
 
         new RetrievePdfStream().execute(txtFileUrl);
+
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_FORWARD);
+            }
+        });
+
+    }
+
+
+    public void checkPermission() {
+        if ((!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) ||
+                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) ||
+                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))||
+                (!(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) )
+        {
+            permissionAccepted= false;
+        }else {
+            permissionAccepted = true;
+        }
     }
 
     class RetrievePdfStream extends AsyncTask<String, Void, InputStream> {
@@ -196,7 +238,9 @@ public class SongActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (hasCamera()) {
-                    RecordingVideo();
+                    if(permissionAccepted) { RecordingVideo();
+                    } else {
+                    Toast.makeText(SongActivity.this, " Permission denied", Toast.LENGTH_LONG).show(); }
                 }else {
                     Toast.makeText(SongActivity.this, "Device does not support Camera", Toast.LENGTH_LONG).show();
                 }
@@ -225,6 +269,7 @@ public class SongActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             videoUri = data.getData();
+
             showAlertAndSaveVideo();
         }
     }
@@ -277,6 +322,20 @@ public class SongActivity extends AppCompatActivity {
         final String vName = name;
         final StorageReference filePath = storageReference.child("Video").child(name + ".mp4");
 
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+//use one of overloaded setDataSource() functions to set your data source
+        retriever.setDataSource(SongActivity.this, videoUri);
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        long timeInMillisec = Long.parseLong(time );
+
+        final String duration = String.format("%02d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(timeInMillisec),
+                TimeUnit.MILLISECONDS.toSeconds(timeInMillisec) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(timeInMillisec))
+        );
+
+        retriever.release();
+
         filePath.putFile(videoUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -287,7 +346,7 @@ public class SongActivity extends AppCompatActivity {
                     public void onSuccess(Uri uri) {
                         Uri downloadUrl = uri;
 
-                        Video newVideo = new Video(vName, "00", uri.toString());
+                        Video newVideo = new Video(vName, duration, uri.toString());
                         manager.AddVideo(userId, newVideo);
 
                         //Do what you want with the url
@@ -306,12 +365,16 @@ public class SongActivity extends AppCompatActivity {
         activateRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isRecording) {
-                    isRecording = true;
-                    startRecording();
-                } else {
-                    isRecording = false;
-                    stopRecording();
+                if(permissionAccepted) {
+                    if (!isRecording) {
+                        isRecording = true;
+                        startRecording();
+                    } else {
+                        isRecording = false;
+                        stopRecording();
+                    }
+                }else {
+                    Toast.makeText(SongActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -332,7 +395,7 @@ public class SongActivity extends AppCompatActivity {
         simpleChronometer.setVisibility(View.VISIBLE);
         recordingLabel.setVisibility(View.VISIBLE);
 
-        Animation animation = AnimationUtils.loadAnimation(SongActivity.this, R.anim.blink);
+        Animation animation = AnimationUtils.loadAnimation(SongActivity.this, R.anim.blink2);
         activateRecord.startAnimation(animation);
 
         simpleChronometer.setBase(SystemClock.elapsedRealtime());

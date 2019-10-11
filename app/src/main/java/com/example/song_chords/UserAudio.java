@@ -34,9 +34,9 @@ public class UserAudio extends AppCompatActivity {
 
     public TextView noRecordingLabel;
     public ArrayList<Audio> recordings;
-    public ArrayList<Boolean> isRePlaying;
+    public boolean isIndPlaying[];
+    private MediaPlayer mediaPlayer=null;
 
-    public MediaPlayer mediaPlayer = null;
     public boolean isPlaying= false;
 
     @Override
@@ -64,6 +64,10 @@ public class UserAudio extends AppCompatActivity {
             public void onClick(View view) {
                 recordings = manager.getAudioListOfUser(userId);
 
+                int num = recordings.size();
+                isIndPlaying = new boolean[num];
+                for(int i=0;i<num; i++) isIndPlaying[i]=false;
+
                 if (recordings == null) {
                     noRecordingLabel.setVisibility(View.VISIBLE);
                     audioList.setAdapter(null);
@@ -87,20 +91,30 @@ public class UserAudio extends AppCompatActivity {
                 Audio audio = recordings.get(i);
                 String audioUrl = audio.getRef();
 
-                reset();
-                streamAudio(audioUrl);
+                if(isIndPlaying[i]==false) {
+                    streamAudio(audioUrl);
+                    isIndPlaying[i] = true;
+                }
+                else {
+                    mediaPlayer.stop();
+                    isIndPlaying[i]=false;
+                }
             }
         });
     }
 
     public void streamAudio(String audioUrl) {
-        if(mediaPlayer!=null)
-            mediaPlayer.stop();
-
         String url = audioUrl; // your URL here
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+        if(mediaPlayer==null){
+            mediaPlayer=new MediaPlayer();
+        }
+        else if(mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
+        }
         try {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setDataSource(url);
         } catch (IOException e) {
             e.printStackTrace();
@@ -119,15 +133,6 @@ public class UserAudio extends AppCompatActivity {
             }
         });
 
-    }
-
-    public void reset(){
-        isRePlaying = new ArrayList<>();
-        for (int j = 0; j < recordings.size(); j++) {
-            isRePlaying.add(false);
-        }
-        if(mediaPlayer!=null)
-            mediaPlayer.stop();
     }
 
     @Override
