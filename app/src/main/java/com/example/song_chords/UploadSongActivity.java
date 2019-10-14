@@ -102,6 +102,7 @@ public class UploadSongActivity extends AppCompatActivity {
         song_lyrics = (TextView) findViewById(R.id.songInput);
         imageView = (ImageView) findViewById(R.id.singer_image);
 
+
         public_CheckBox = (CheckBox)findViewById(R.id.bok_public);
         private_CheckBox = (CheckBox)findViewById(R.id.bok_private);
 
@@ -140,8 +141,8 @@ public class UploadSongActivity extends AppCompatActivity {
                         Toast.makeText(UploadSongActivity.this, "Please enter singer name!", Toast.LENGTH_LONG).show();
                     } else {
                         // Create pdf file for the new song
-                        //createPDF();
-                        savePDF();
+                        createPDF();
+                        //savePDF();
 
                         // Upload the song to fireBase
                         // Public - to the public song list
@@ -220,25 +221,6 @@ public class UploadSongActivity extends AppCompatActivity {
         }
     }
 
-
-    public void savePDF(){
-        Document document = new Document();
-        String myFilePath = getExternalCacheDir().getAbsolutePath() + "/mySongPDF.pdf";
-
-        try{
-            String lyrics = song_lyrics.getText().toString();
-
-            PdfWriter.getInstance(document,new FileOutputStream(myFilePath));
-            document.open();
-            document.add(new Paragraph(lyrics));
-            document.close();
-
-            file = new File(myFilePath);
-        }catch (Exception e){
-            Toast.makeText(this,e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void createPDF() {
 
         PdfDocument pdfDocument = new PdfDocument();
@@ -248,8 +230,9 @@ public class UploadSongActivity extends AppCompatActivity {
         Canvas canvas = page.getCanvas();
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
+        paint.setTextSize(20);
 
-        page.getCanvas().drawText(sondLyrics, 10, 25, paint);
+        page.getCanvas().drawText(sondLyrics, 20, 50, paint);
         pdfDocument.finishPage(page);
 
         String myFilePath = getExternalCacheDir().getAbsolutePath() + "/mySongPDF.pdf";
@@ -258,6 +241,17 @@ public class UploadSongActivity extends AppCompatActivity {
         try {
             pdfDocument.writeTo(new FileOutputStream(file));
         } catch (Exception e) {
+
+
+
+
+
+
+
+
+
+
+
             e.printStackTrace();
         }
         pdfDocument.close();
