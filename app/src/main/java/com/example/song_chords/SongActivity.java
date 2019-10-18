@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnRenderListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -39,6 +40,7 @@ import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -60,6 +62,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -106,6 +110,11 @@ public class SongActivity extends AppCompatActivity {
     public String rec_time;
 
     public boolean permissionAccepted = true;
+
+    public int x=0;
+    public int y=0;
+
+    public int currentPage=0;
 
 
     @Override
@@ -164,13 +173,21 @@ public class SongActivity extends AppCompatActivity {
 
         new RetrievePdfStream().execute(txtFileUrl);
 
-        scrollView.post(new Runnable() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doAsynchronousTask = new TimerTask() {
             @Override
             public void run() {
-                scrollView.fullScroll(ScrollView.FOCUS_FORWARD);
-            }
-        });
+                handler.post(new Runnable() {
+                    public void run() {
+                        pdfView.setScrollX(x);
+                        pdfView.setScrollY(y++);
 
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 10);
     }
 
 
@@ -214,7 +231,7 @@ public class SongActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // your code.
+
         Intent intent = new Intent(SongActivity.this, SearchSongActivity.class);
         intent.putExtra(EXTRA_USER_ID, userId);
         startActivity(intent);

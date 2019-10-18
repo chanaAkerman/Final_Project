@@ -294,11 +294,27 @@ public class FirebaseManager {
         ArrayList<Song> song = null;
         // public song
         for (int i = 0; i < songs.size(); i++) {
-            if (songs.get(i).getName().equals(name)  || songs.get(i).getSingerName().equals(name)) {
-                if (song == null) {
-                    song = new ArrayList<>();
+            if(songs.get(i).getName().length()>=name.length()){
+                String sub = songs.get(i).getName().substring(0,name.length());
+                if(sub.equalsIgnoreCase(name)){
+                    if (song == null) {
+                        song = new ArrayList<>();
+                    }
+                    song.add(songs.get(i));
                 }
-                song.add(songs.get(i));
+            }
+        }
+
+        //public singer
+        for (int i = 0; i < songs.size(); i++) {
+            if(songs.get(i).getSingerName().length()>=name.length()){
+                String sub = songs.get(i).getSingerName().substring(0,name.length());
+                if(sub.equalsIgnoreCase(name)){
+                    if (song == null) {
+                        song = new ArrayList<>();
+                    }
+                    song.add(songs.get(i));
+                }
             }
         }
 
@@ -313,11 +329,14 @@ public class FirebaseManager {
                     songs1=users.get(i).getSongsList();
 
                     for(int j=0; j<songs1.size(); j++){
-                        if(songs1.get(j).getName().equals(name)) {
-                            if (song == null) {
-                                song = new ArrayList<>();
+                        if(songs1.get(j).getName().length()>=name.length()){
+                            String sub = songs1.get(i).getName().substring(0,name.length());
+                            if(sub.equalsIgnoreCase(name)){
+                                if (song == null) {
+                                    song = new ArrayList<>();
+                                }
+                                song.add(songs.get(i));
                             }
-                            song.add(songs1.get(j));
                         }
                     }
                 }
