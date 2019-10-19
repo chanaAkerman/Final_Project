@@ -15,11 +15,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.pdf.PdfDocument;
-import android.icu.text.UnicodeSetSpanner;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -34,19 +32,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfWriter;
 
 
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class UploadSongActivity extends AppCompatActivity {
@@ -56,7 +49,7 @@ public class UploadSongActivity extends AppCompatActivity {
     public String userId;
     public String songName;
     public String singerName;
-    public String sondLyrics;
+    public String songLyrics;
 
     public TextView song_name;
     public TextView singer_name;
@@ -133,7 +126,7 @@ public class UploadSongActivity extends AppCompatActivity {
                 if(permissionAccepted) {
                     songName = song_name.getText() + "";
                     singerName = singer_name.getText() + "";
-                    sondLyrics = song_lyrics.getText() + "";
+                    songLyrics = song_lyrics.getText() + "";
 
                     if (songName == "") {
                         Toast.makeText(UploadSongActivity.this, "Please enter song name!", Toast.LENGTH_LONG).show();
@@ -142,7 +135,6 @@ public class UploadSongActivity extends AppCompatActivity {
                     } else {
                         // Create pdf file for the new song
                         createPDF();
-                        //savePDF();
 
                         // Upload the song to fireBase
                         // Public - to the public song list
@@ -152,10 +144,6 @@ public class UploadSongActivity extends AppCompatActivity {
                         } else {
                             uploadSongPrivate();
                         }
-
-                        // Exit Activity after uploading - possible to stay and upload more.
-                        exitDialog();
-
                     }
                 }else{
                     Toast.makeText(UploadSongActivity.this, " Permission denied", Toast.LENGTH_LONG).show();
@@ -212,10 +200,8 @@ public class UploadSongActivity extends AppCompatActivity {
 
 
             } catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -224,16 +210,48 @@ public class UploadSongActivity extends AppCompatActivity {
     public void createPDF() {
 
         PdfDocument pdfDocument = new PdfDocument();
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(300, 600, 1).create();
-        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
 
-        Canvas canvas = page.getCanvas();
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(20);
+        ArrayList<String> newL = new ArrayList<>();
 
-        page.getCanvas().drawText(sondLyrics, 20, 50, paint);
-        pdfDocument.finishPage(page);
+        String newSong = "";
+        for (int i = 0; i < songLyrics.length(); i++) {
+            if (songLyrics.charAt(i) == '\n') {
+                newL.add(newSong);
+                newSong = "";
+
+            } else {
+                newSong += songLyrics.charAt(i);
+            }
+        }
+        newL.add(newSong);
+
+        int numberOfPages = (int) (newL.size() / 12)+1;
+
+        // Define the first page
+        PdfDocument.PageInfo pageInfo_01 = new PdfDocument.PageInfo.Builder(594, 792, 0).create();
+
+        int pagesCounter=0;
+        int index=0;
+        while (pagesCounter<numberOfPages) {
+            int y=100;
+            PdfDocument.Page page_01 = pdfDocument.startPage(pageInfo_01);
+
+            // Style
+            Canvas canvas = page_01.getCanvas();
+            Paint paint = new Paint();
+            paint.setColor(Color.BLACK);
+            paint.setTextSize(25);
+
+            int counter=0;
+            while (counter<10 && index<newL.size()){
+                page_01.getCanvas().drawText(newL.get(index), 60, y, paint);
+                // indexers
+                index++; counter++; y+=50;
+            }
+
+            pdfDocument.finishPage(page_01);
+            pagesCounter++;
+        }
 
         String myFilePath = getExternalCacheDir().getAbsolutePath() + "/mySongPDF.pdf";
         file = new File(myFilePath);
@@ -241,17 +259,6 @@ public class UploadSongActivity extends AppCompatActivity {
         try {
             pdfDocument.writeTo(new FileOutputStream(file));
         } catch (Exception e) {
-
-
-
-
-
-
-
-
-
-
-
             e.printStackTrace();
         }
         pdfDocument.close();
@@ -278,9 +285,13 @@ public class UploadSongActivity extends AppCompatActivity {
                         Song newSong = new Song(songName, singerName, picUri, uri.toString());
                         //Upload song
                         manager.saveSong(newSong);
+
+                        // Exit Activity after uploading - possible to stay and upload more.
+                        exitDialog();
                     }
                 });
             }
+
         });
 
     }
@@ -305,6 +316,9 @@ public class UploadSongActivity extends AppCompatActivity {
                         Song newSong = new Song(songName, singerName, picUri, uri.toString());
                         //Upload song
                         manager.saveSongInUser(userId,newSong);
+
+                        // Exit Activity after uploading - possible to stay and upload more.
+                        exitDialog();
                     }
                 });
             }
@@ -420,7 +434,7 @@ public class UploadSongActivity extends AppCompatActivity {
 
                         songName = song_name.getText() + "";
                         singerName= singer_name.getText() + "";
-                        sondLyrics= song_lyrics.getText() + "";
+                        songLyrics = song_lyrics.getText() + "";
 
                         if (songName == "") {
                             Toast.makeText(UploadSongActivity.this, "Please enter song name!", Toast.LENGTH_LONG).show();

@@ -55,7 +55,7 @@
                     android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toEndOf="@id/btn_record"
+                    android:layout_toRightOf="@id/btn_record"
                     android:layout_marginTop="35dp"
                     android:textColor="#FF001B"
                     android:textSize="15dp"/>
@@ -80,6 +80,14 @@
                     android:paddingLeft="25dp"
                     android:gravity="right"
                     android:textColor="#030303"/>
+
+                <ImageButton
+                    android:id="@+id/btn_Scrolling"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/ic_play"
+                    android:layout_toRightOf="@id/recording_label"
+                    android:layout_marginTop="30dp"/>
 
 
             </RelativeLayout>

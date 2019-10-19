@@ -300,7 +300,9 @@ public class FirebaseManager {
                     if (song == null) {
                         song = new ArrayList<>();
                     }
-                    song.add(songs.get(i));
+                    if(!songExist(song,songs.get(i))){
+                        song.add(songs.get(i));
+                    }
                 }
             }
         }
@@ -313,7 +315,9 @@ public class FirebaseManager {
                     if (song == null) {
                         song = new ArrayList<>();
                     }
-                    song.add(songs.get(i));
+                    if(!songExist(song,songs.get(i))){
+                        song.add(songs.get(i));
+                    }
                 }
             }
         }
@@ -330,12 +334,14 @@ public class FirebaseManager {
 
                     for(int j=0; j<songs1.size(); j++){
                         if(songs1.get(j).getName().length()>=name.length()){
-                            String sub = songs1.get(i).getName().substring(0,name.length());
+                            String sub = songs1.get(j).getName().substring(0,name.length());
                             if(sub.equalsIgnoreCase(name)){
                                 if (song == null) {
                                     song = new ArrayList<>();
                                 }
-                                song.add(songs.get(i));
+                                if(!songExist(songs1,songs1.get(j))){
+                                    song.add(songs1.get(j));
+                                }
                             }
                         }
                     }
@@ -343,6 +349,17 @@ public class FirebaseManager {
             }
         }
         return song;
+    }
+
+    public boolean songExist(ArrayList<Song> songArrayList,Song song){
+        if(songArrayList!=null){
+            for(int i=0 ;i<songArrayList.size(); i++){
+                if(songArrayList.get(i).equals(song)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public ArrayList<Audio> getAudioListOfUser(String id) {

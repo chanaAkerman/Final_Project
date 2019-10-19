@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
@@ -51,6 +52,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -88,6 +90,7 @@ public class SongActivity extends AppCompatActivity {
 
     public Button activateCamera;
     public Button activateRecord;
+    public ImageButton scrolling;
 
     public Uri videoUri;
     public Uri audioUri;
@@ -115,6 +118,11 @@ public class SongActivity extends AppCompatActivity {
     public int y=0;
 
     public int currentPage=0;
+
+    public boolean isScrolling=false;
+    public Handler handler = new Handler();
+    public Timer timer = null;
+
 
 
     @Override
@@ -164,32 +172,50 @@ public class SongActivity extends AppCompatActivity {
         recordingLabel = (TextView) findViewById(R.id.recording_label);
         activateCamera = (Button) findViewById(R.id.btn_camera);
         activateRecord = (Button) findViewById(R.id.btn_record);
+        scrolling =(ImageButton)findViewById(R.id.btn_Scrolling);
 
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         toolbarLayout.setTitle(songName);
 
         setCameraAction();
         setRecordingAction();
+        setScrollingAction();
 
         new RetrievePdfStream().execute(txtFileUrl);
-
-        final Handler handler = new Handler();
-        Timer timer = new Timer();
-        TimerTask doAsynchronousTask = new TimerTask() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        pdfView.setScrollX(x);
-                        pdfView.setScrollY(y++);
-
-                    }
-                });
-            }
-        };
-        timer.schedule(doAsynchronousTask, 0, 10);
     }
 
+    public void setScrollingAction(){
+        scrolling.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isScrolling) {
+                    isScrolling=true;
+
+                    scrolling.setBackgroundResource(R.drawable.ic_stop);
+                    timer = new Timer();
+                    TimerTask doAsynchronousTask = new TimerTask() {
+                        @Override
+                        public void run() {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    pdfView.setScrollX(x);
+                                    pdfView.setScrollY(y++);
+
+                                }
+                            });
+                        }
+                    };
+                    timer.schedule(doAsynchronousTask, 0, 10);
+                }else{
+                    isScrolling=false;
+                    scrolling.setBackgroundResource(R.drawable.ic_play);
+
+                    if(timer!=null)
+                        timer.cancel();
+                }
+            }
+        });
+    }
 
     public void checkPermission() {
         if ((!(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) ||
@@ -231,6 +257,8 @@ public class SongActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        if(timer!=null)
+            timer.cancel();
 
         Intent intent = new Intent(SongActivity.this, SearchSongActivity.class);
         intent.putExtra(EXTRA_USER_ID, userId);

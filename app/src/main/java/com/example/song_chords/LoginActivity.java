@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.accounts.Account;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
@@ -31,6 +33,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -135,10 +138,12 @@ public class LoginActivity extends AppCompatActivity {
             User user = manager.getUserByEmail(googleEmail);
             textEmail.setText(googleEmail);
             password.setText(user.getPassword());
+
             Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
             intent.putExtra(EXTRA_USER_ID, user.getId());
             startActivity(intent);
             finish();
+
             overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
         }
         else if(manager.emailExist(googleEmail)){
@@ -214,11 +219,26 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Wrong Password", Toast.LENGTH_LONG).show();
                         overridePendingTransition(R.anim.rotate,R.anim.blink);
                     } else {
-                        Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
+                        if(!isInternetAvailable()){
+                            Toast.makeText(LoginActivity.this,"Internet Connection Is Required",Toast.LENGTH_LONG).show();
+                        }else {
+                            Toast.makeText(LoginActivity.this, "User not exist in database", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             }
         });
+    }
+
+    public boolean isInternetAvailable() {
+        try {
+            InetAddress ipAddr = InetAddress.getByName("google.com");
+            //You can replace it with your name
+            return !ipAddr.equals("");
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void setForgotPasswordAction(){
@@ -249,7 +269,6 @@ public class LoginActivity extends AppCompatActivity {
                 intent.putExtra(EXTRA_USER_GMAIL, "");
                 startActivity(intent);
                 finish();
-                overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
             }
         });
     }
@@ -312,21 +331,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void addSongs(){
-        /*Song s1 = new Song("אם יש גן עדן", "אייל גולן","","");
-        Song s3 = new Song("אהבה קטנה", "שירי מימון", "", "");
-        Song s4 = new Song("את לי הכל", "הראל סקעת", "", "");
-        Song s5 = new Song("אושר לדקה", "אורי בן ארי", "", "");
-        Song s6 = new Song("אמא אם הייתי", "חנן בן ארי", "", "");
-        Song s7 = new Song("באתי לחלום", "נתן גושן", "", "");
-        Song s8 = new Song("בסוף כל יום", "אייל גולן", "", "");
-        Song s9 = new Song("כל מה שיש לי", "נתן גושן", "", "");
-        Song s10 = new Song("משהו ממני", "הראל סקעת", "", "");
-        Song s11 = new Song("מתנות קטנות", "רמי קלינשטיין", "", "");
-        Song s12 = new Song("עד שתחזור", "יובל דיין", "", "");
-        Song s13 = new Song("רצים באוויר", "גיא ויהל", "", "");
-        Song s14 = new Song("תוכו רצוף אהבה", "ישי ריבו", "", "");*/
-
-
         Song s1 = new Song("Tonight", "Jonas Brothers","","");
         Song s3 = new Song("Hello Beautiful", "Jonas Brothers", "", "");
         Song s4 = new Song("Australia", "Jonas Brothers", "", "");

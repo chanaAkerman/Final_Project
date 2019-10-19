@@ -2,6 +2,8 @@ package com.example.song_chords;
 
 import android.graphics.Picture;
 
+import androidx.annotation.Nullable;
+
 public class Song {
     public String name;
     public String singerName;
@@ -52,5 +54,16 @@ public class Song {
     @Override
     public String toString() {
         return "[ "+name+", "+singerName+", "+pictureRef+", "+chordsRef+" ]";
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if(this.name.equals( ((Song)obj).getName()) &&
+                this.singerName.equals( ((Song)obj).getSingerName()) &&
+                this.pictureRef.equals( ((Song)obj).getPictureRef()) &&
+                this.chordsRef.equals( ((Song)obj).getChordsRef())){
+            return true;
+        }
+        return false;
     }
 }
