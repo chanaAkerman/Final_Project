@@ -64,15 +64,15 @@ public class UserAudio extends AppCompatActivity {
             public void onClick(View view) {
                 recordings = manager.getAudioListOfUser(userId);
 
-                int num = recordings.size();
-                isIndPlaying = new boolean[num];
-                for(int i=0;i<num; i++) isIndPlaying[i]=false;
-
                 if (recordings == null) {
                     noRecordingLabel.setVisibility(View.VISIBLE);
                     audioList.setAdapter(null);
                 } else {
                     noRecordingLabel.setVisibility(View.INVISIBLE);
+
+                    int num = recordings.size();
+                    isIndPlaying = new boolean[num];
+                    for (int i = 0; i < num; i++) isIndPlaying[i] = false;
 
                     //creating adapter
                     AudioList audioAdapter;
