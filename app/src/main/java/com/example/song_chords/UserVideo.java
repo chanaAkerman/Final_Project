@@ -20,7 +20,7 @@ public class UserVideo extends AppCompatActivity {
 
     public String userId;
     public ListView videoList;
-    public Button refresh;
+    public Button refresh_button;
 
     public TextView noVideoLabel;
     public ArrayList<Video> videos;
@@ -30,13 +30,17 @@ public class UserVideo extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_video);
 
-        manager = new FirebaseManager();
+        manager = new FirebaseManager(new CallBack(){
+            public void fetch(){
+                refreshListUi();
+            }
+        });
 
         Intent intent = getIntent();
         userId=intent.getStringExtra(MenuActivity.EXTRA_USER_ID);
 
         noVideoLabel = (TextView)findViewById(R.id.no_videos);
-        refresh = (Button) findViewById(R.id.btn_refresh);
+        refresh_button = (Button) findViewById(R.id.btn_refresh);
 
         videoList = (ListView)findViewById(R.id.video_list);
 
@@ -45,23 +49,27 @@ public class UserVideo extends AppCompatActivity {
     }
 
     public void setOnRefreshButton() {
-        refresh.setOnClickListener(new View.OnClickListener() {
+        refresh_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                videos = manager.getVideoListOfUser(userId);
-
-                if(videos==null) {
-                    noVideoLabel.setVisibility(View.VISIBLE);
-                    videoList.setAdapter(null);
-                }else{
-                    noVideoLabel.setVisibility(View.INVISIBLE);
-                    //creating adapter
-                    VideoList videoAdapter;
-                    videoAdapter = new VideoList(UserVideo.this,videos);
-                    videoList.setAdapter(videoAdapter);
-                }
+                refreshListUi();
             }
         });
+    }
+
+    private void refreshListUi() {
+        videos = manager.getVideoListOfUser(userId);
+
+        if(videos==null) {
+            noVideoLabel.setVisibility(View.VISIBLE);
+            videoList.setAdapter(null);
+        }else{
+            noVideoLabel.setVisibility(View.INVISIBLE);
+            //creating adapter
+            VideoList videoAdapter;
+            videoAdapter = new VideoList(UserVideo.this,videos);
+            videoList.setAdapter(videoAdapter);
+        }
     }
 
     public void setVideoListAction(){

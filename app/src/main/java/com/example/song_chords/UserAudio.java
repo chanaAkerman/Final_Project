@@ -1,27 +1,20 @@
 package com.example.song_chords;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
+import android.telecom.Call;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class UserAudio extends AppCompatActivity {
     public static final String EXTRA_USER_ID = "com.example.application.Song_Chords.EXTRA_USER_ID";
@@ -30,7 +23,7 @@ public class UserAudio extends AppCompatActivity {
 
     public String userId;
     public ListView audioList;
-    public Button refresh;
+    public Button refresh_button;
 
     public TextView noRecordingLabel;
     public ArrayList<Audio> recordings;
@@ -44,7 +37,17 @@ public class UserAudio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_audio);
 
-        manager = new FirebaseManager();
+        /*manager = new FirebaseManager(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshListUi();
+            }
+        });*/
+        manager = new FirebaseManager(new CallBack(){
+            public void fetch(){
+                refreshListUi();
+            }
+        });
         recordings = new ArrayList<>();
 
         Intent intent = getIntent();
@@ -52,35 +55,40 @@ public class UserAudio extends AppCompatActivity {
 
         audioList = (ListView)findViewById(R.id.audio_list);
         noRecordingLabel = (TextView)findViewById(R.id.no_recordings);
-        refresh = (Button) findViewById(R.id.btn_vrefresh);
+        refresh_button = (Button) findViewById(R.id.btn_vrefresh);
 
         showRefreshButton();
         setAudioListAction();
     }
-
     public void showRefreshButton() {
-        refresh.setOnClickListener(new View.OnClickListener() {
+        //Use` Callback instead
+        refresh_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                recordings = manager.getAudioListOfUser(userId);
-
-                if (recordings == null) {
-                    noRecordingLabel.setVisibility(View.VISIBLE);
-                    audioList.setAdapter(null);
-                } else {
-                    noRecordingLabel.setVisibility(View.INVISIBLE);
-
-                    int num = recordings.size();
-                    isIndPlaying = new boolean[num];
-                    for (int i = 0; i < num; i++) isIndPlaying[i] = false;
-
-                    //creating adapter
-                    AudioList audioAdapter;
-                    audioAdapter = new AudioList(UserAudio.this, recordings);
-                    audioList.setAdapter(audioAdapter);
-                }
+                refreshListUi();
             }
         });
+    }
+
+    private void refreshListUi() {
+
+        recordings = manager.getAudioListOfUser(userId);
+
+        if (recordings == null) {
+            noRecordingLabel.setVisibility(View.VISIBLE);
+            audioList.setAdapter(null);
+        } else {
+            noRecordingLabel.setVisibility(View.INVISIBLE);
+
+            int num = recordings.size();
+            isIndPlaying = new boolean[num];
+            for (int i = 0; i < num; i++) isIndPlaying[i] = false;
+
+            //creating adapter
+            AudioList audioAdapter;
+            audioAdapter = new AudioList(UserAudio.this, recordings);
+            audioList.setAdapter(audioAdapter);
+        }
     }
 
     public void setAudioListAction(){

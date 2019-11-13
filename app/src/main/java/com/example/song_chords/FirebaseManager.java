@@ -2,6 +2,7 @@ package com.example.song_chords;
 
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
@@ -22,19 +23,38 @@ public class FirebaseManager {
     public DatabaseReference songsRef;
     public ArrayList<User> users;
     public ArrayList<Song> songs;
+    //View.OnClickListener onClickListener;
+    CallBack callBack;
 
     public FirebaseManager() {
+        this(null);
+    }
+    public FirebaseManager(CallBack callBack){
         this.database = FirebaseDatabase.getInstance();
         this.usersRef = database.getReference("Users");
         this.songsRef = database.getReference("Songs");
         users = new ArrayList<>();
         songs = new ArrayList<>();
+        this.callBack = callBack;
 
         setUsersRef();
         setSongsRef();
     }
+
+    /*public FirebaseManager(View.OnClickListener onClickListener) {
+        this.database = FirebaseDatabase.getInstance();
+        this.usersRef = database.getReference("Users");
+        this.songsRef = database.getReference("Songs");
+        users = new ArrayList<>();
+        songs = new ArrayList<>();
+        this.onClickListener = onClickListener;
+
+        setUsersRef();
+        setSongsRef();
+    }*/
+
     public FirebaseManager refresh(){
-       return new FirebaseManager();
+       return new FirebaseManager(null);
     }
 
     public void updateUserAudio(String id, Audio newAudio) {
@@ -258,6 +278,13 @@ public class FirebaseManager {
                         users.add(user);
                     }
                 }
+
+                if(callBack!=null){
+                    callBack.fetch();
+                }
+                /*if (onClickListener != null) {
+                    onClickListener.onClick(null);
+                }*/
             }
 
             @Override
