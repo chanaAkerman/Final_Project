@@ -23,12 +23,12 @@ public class FirebaseManager {
     public DatabaseReference songsRef;
     public ArrayList<User> users;
     public ArrayList<Song> songs;
-    //View.OnClickListener onClickListener;
     CallBack callBack;
 
     public FirebaseManager() {
         this(null);
     }
+
     public FirebaseManager(CallBack callBack){
         this.database = FirebaseDatabase.getInstance();
         this.usersRef = database.getReference("Users");
@@ -40,18 +40,6 @@ public class FirebaseManager {
         setUsersRef();
         setSongsRef();
     }
-
-    /*public FirebaseManager(View.OnClickListener onClickListener) {
-        this.database = FirebaseDatabase.getInstance();
-        this.usersRef = database.getReference("Users");
-        this.songsRef = database.getReference("Songs");
-        users = new ArrayList<>();
-        songs = new ArrayList<>();
-        this.onClickListener = onClickListener;
-
-        setUsersRef();
-        setSongsRef();
-    }*/
 
     public FirebaseManager refresh(){
        return new FirebaseManager(null);
@@ -282,9 +270,6 @@ public class FirebaseManager {
                 if(callBack!=null){
                     callBack.fetch();
                 }
-                /*if (onClickListener != null) {
-                    onClickListener.onClick(null);
-                }*/
             }
 
             @Override

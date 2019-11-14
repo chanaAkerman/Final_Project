@@ -37,12 +37,6 @@ public class UserAudio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_audio);
 
-        /*manager = new FirebaseManager(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshListUi();
-            }
-        });*/
         manager = new FirebaseManager(new CallBack(){
             public void fetch(){
                 refreshListUi();
