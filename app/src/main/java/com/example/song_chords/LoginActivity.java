@@ -262,9 +262,6 @@ public class LoginActivity extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Animation animation = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.rotate);
-                register.startAnimation(animation);
-
                 Intent intent = new Intent(LoginActivity.this,RegisterActivity.class);
                 intent.putExtra(EXTRA_USER_GMAIL, "");
                 startActivity(intent);
@@ -309,25 +306,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         sender.start();
-    }
-
-    public void sendMessage2(String email,String pass){
-        Log.i("SendMailActivity", "Send Button Clicked.");
-
-        String fromEmail = "chana.80a@gmail.com";
-        String fromPassword = "chana770";
-        String toEmails = email;
-
-        List<String> toEmailList = Arrays.asList(toEmails
-                .split("\\s*,\\s*"));
-        Log.i("SendMailActivity", "To List: " + toEmailList);
-
-        String emailSubject = "Password Reminder";
-
-        String emailBody = "Your password is: "+pass;
-
-        new SendMailTask(LoginActivity.this).execute(fromEmail,
-                fromPassword, toEmailList, emailSubject, emailBody);
     }
 
     public void addSongs(){

@@ -150,13 +150,13 @@ public class MenuActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // The user wants to leave - so dismiss the dialog and exit
 
-                        /*googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        googleSignInClient.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 //On Succesfull signout we navigate the user back to LoginActivity
                                 finish();
                             }
-                        });*/
+                        });
                         dialog.dismiss();
                     }
                 }).setNegativeButton("NO", new DialogInterface.OnClickListener() {
